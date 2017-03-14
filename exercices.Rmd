@@ -1,0 +1,90 @@
+---
+title: "R Exercices PH525.3x"
+output: html_notebook
+---
+
+## R Refresher Exercises
+### R Refresher Exercises #1
+
+Download and install the GSE5859Subset package then load the data.
+
+
+```{r}
+library(devtools)
+install_github("genomicsclass/GSE5859Subset")
+library(GSE5859Subset)
+data(GSE5859Subset) ##this loads the three tables
+```
+
+
+How many samples where processed on 2005-06-27?
+
+
+```{r}
+length(grep('2005-06-27', sampleInfo$date))
+```
+
+### R Refresher Exercises #2
+
+How many of the genes represented in this particular technology are on chromosome Y?
+
+```{r}
+length(which(geneAnnotation == "chrY"))
+```
+
+### R Refresher Exercises #3
+
+What is the log expression value of the for gene ARPC1A on the one subject that we measured on 2005-06-10?
+
+```{r}
+pid = geneAnnotation$PROBEID[which(geneAnnotation$SYMBOL== 'ARPC1A')]
+samDate = sampleInfo$filename[(grep('2005-06-10', sampleInfo$date))]
+
+geneExpression[pid,samDate]
+```
+
+
+### R Refresher Exercises #4
+
+Use the function apply to find the median value of each column. What is the median value of these values?
+
+```{r}
+firstMed = apply(geneExpression, 2, median)
+secMed = median(firstMed)
+secMed
+```
+
+###  R Refresher Exercises #5
+
+This problem is more advanced than the previous ones. Note that it might take you some time to solve and you should feel free to seek help in the discussion forum. The exercises is meant to motivate you to learn a an imporant R skills: creating functions to use with apply.
+
+Write a function that takes a vector of values e and a binary vector group coding two groups, and returns the p-value from a t-test: t.test( e[group==1], e[group==0])$p.value.
+
+Now define g to code cases (1) and controls (0) like this g <- factor(sampleInfo$group)
+
+Next use the function apply to run a t-test for each row of geneExpression and obtain the p-value. What is smallest p-value among all these t-tests? 
+
+```{r}
+
+tpval = function(e, group){
+  group = as.factor(group)
+  pVal = t.test(e[group==1], e[group == 0])$p.value
+  return(pVal)
+}
+
+e = rnorm(20)
+g0 = as.factor(sample(c(0,1), length(e), replace = T))
+# t.test(e[g0==1], e[g0 == 0])$pvalue
+
+res = tpval(e, g0)
+res
+
+g = g <- factor(sampleInfo$group)
+
+sort(apply(geneExpression,1,tpval, g))[1]
+
+
+```
+
+
+
