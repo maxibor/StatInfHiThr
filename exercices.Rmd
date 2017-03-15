@@ -2,6 +2,7 @@
 title: "R Exercices PH525.3x"
 output: html_notebook
 ---
+#WEEK 1
 
 ## R Refresher Exercises
 ### R Refresher Exercises #1
@@ -94,11 +95,14 @@ These exercises will help clarify that p-values are random variables and some of
 To see this, let's see how p-values change when we take different samples.
 
 ```{r}
+
 set.seed(1)
 library(downloader)
 url = "https://raw.githubusercontent.com/genomicsclass/dagdata/master/inst/extdata/femaleControlsPopulation.csv"
 filename = "femaleControlsPopulation.csv"
-if (!file.exists(filename)) download(url,destfile=filename)
+if (!file.exists(filename)) {
+  download(url,destfile=filename)
+}
 population = read.csv(filename)
 pvals <- replicate(1000,{
   control = sample(population[,1],12)
@@ -197,4 +201,60 @@ Using the same simulation data from the question above, for what proportion of t
 length(which(lenVec >= 1 ))/length(lenVec)
 ```
 
+
+# WEEK 2
+
+Which procedure is more conservative (picks less genes, i.e. rejects less null hypothesis): Bonferroni's or Sidak's?
+Make a plot of $\alpha/m$ and $1-(1-\alpha)^{1/m}$ and for various values of m>1. 
+
+```{r}
+alpha <- seq(0,0.25,0.01)
+m = 1:10000
+bonferroni = alpha/m
+sidak = 1-(1 - alpha)**(1/m)
+plot(m, sidak, col = "red", ylab = "k", pch = 20)
+points(m, bonferroni, col = "green", pch = 21)
+```
+
+### Bonferroni Correction Exercises #2 (Monte Carlo Simulation) 
+
+Monte Carlo simulation. To simulate the p-value results of, say, 8,793 t-tests for which the null is true we don't actual have to generate the original data. As we learned in class we can generate p-values from a uniform distribution like this:
+
+`pvals <- runif(8793,0,1)`
+
+Using what we have learned, set the cutoff using the Bonferroni correction that guarantees an FWER lower than 0.05 and report back the FWER. Set the seed at 1, `set.seed(1)` and run 10,000 simulation. Report the Monte Carlo estimate of the FWER below.
+
+```{r}
+set.seed(1)
+alpha = 0.05
+m = 8793
+k = alpha/m
+estimate = c()
+for (i in 1:10000){
+  pvals <- runif(m,0,1)
+  estimate[i] = sum(pvals<k)
+}
+
+mean(estimate)
+
+
+```
+
+Using the same seed repeat the above for Sidak's cutoff. 
+
+
+```{r}
+set.seed(1)
+alpha = 0.05
+m = 8793
+k = 1-(1 - alpha)**(1/m)
+estimate = c()
+for (i in 1:10000){
+  pvals <- runif(m,0,1)
+  estimate[i] = sum(pvals<k)
+}
+
+mean(estimate)
+
+```
 
