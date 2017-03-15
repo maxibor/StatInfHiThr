@@ -479,11 +479,335 @@ mean(estimate)</code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
+</div>
+<div id="fdr-exercises" class="section level2">
+<h2>FDR Exercises</h2>
+<p>In this assessment we will define error controlling procedures for experimental data. We will make list of genes based on q-values. We will also assess your understanding of false positives rates and false negative rates by asking you to create a Monte Carlo simulation.</p>
 <!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuaW5zdGFsbF9iaW9jKFwicXZhbHVlXCIpXG5cbmBgYCJ9 -->
+<pre class="r"><code>install_bioc(&quot;qvalue&quot;)
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiRG93bmxvYWRpbmcgQmlvY29uZHVjdG9yIHJlcG8gcXZhbHVlXG4vdXNyL2Jpbi9zdm4gY28gLS11c2VybmFtZSByZWFkb25seSAtLXBhc3N3b3JkIHJlYWRvbmx5IGh0dHBzOi8vaGVkZ2Vob2cuZmhjcmMub3JnL2Jpb2NvbmR1Y3Rvci90cnVuay9tYWRtYW4vUnBhY2tzL3F2YWx1ZSAvdG1wL1J0bXBQbWpYVjMvZmlsZWEyYjZhYjIxZjVmXG5JbnN0YWxsaW5nIHF2YWx1ZVxuJy91c3IvbGliL1IvYmluL1InIC0tbm8tc2l0ZS1maWxlIC0tbm8tZW52aXJvbiAtLW5vLXNhdmUgLS1uby1yZXN0b3JlIC0tcXVpZXQgQ01EIElOU1RBTEwgIFxcXG4gICcvdG1wL1J0bXBQbWpYVjMvZmlsZWEyYjZhYjIxZjVmJyAtLWxpYnJhcnk9Jy9ob21lL21heGltZS9SL3g4Nl82NC1wYy1saW51eC1nbnUtbGlicmFyeS8zLjMnIC0taW5zdGFsbC10ZXN0cyBcblxuKiBpbnN0YWxsaW5nICpzb3VyY2UqIHBhY2thZ2Ug4oCYcXZhbHVl4oCZIC4uLlxuKiogUlxuKiogZGF0YVxuKiogaW5zdFxuKiogcHJlcGFyaW5nIHBhY2thZ2UgZm9yIGxhenkgbG9hZGluZ1xuKiogaGVscFxuKioqIGluc3RhbGxpbmcgaGVscCBpbmRpY2VzXG4qKiBidWlsZGluZyBwYWNrYWdlIGluZGljZXNcbioqIGluc3RhbGxpbmcgdmlnbmV0dGVzXG4qKiB0ZXN0aW5nIGlmIGluc3RhbGxlZCBwYWNrYWdlIGNhbiBiZSBsb2FkZWRcbiogRE9ORSAocXZhbHVlKVxuIn0= -->
+<pre><code>Downloading Bioconductor repo qvalue
+/usr/bin/svn co --username readonly --password readonly https://hedgehog.fhcrc.org/bioconductor/trunk/madman/Rpacks/qvalue /tmp/RtmpPmjXV3/filea2b6ab21f5f
+Installing qvalue
+'/usr/lib/R/bin/R' --no-site-file --no-environ --no-save --no-restore --quiet CMD INSTALL  \
+  '/tmp/RtmpPmjXV3/filea2b6ab21f5f' --library='/home/maxime/R/x86_64-pc-linux-gnu-library/3.3' --install-tests 
+
+* installing *source* package ‘qvalue’ ...
+** R
+** data
+** inst
+** preparing package for lazy loading
+** help
+*** installing help indices
+** building package indices
+** installing vignettes
+** testing if installed package can be loaded
+* DONE (qvalue)</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<div id="fdr-exercises-1" class="section level3">
+<h3>FDR Exercises #1</h3>
+<p>Load the gene expression data</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShHU0U1ODU5U3Vic2V0KVxuZGF0YShHU0U1ODU5U3Vic2V0KVxuYGBgIn0= -->
+<pre class="r"><code>library(GSE5859Subset)
+data(GSE5859Subset)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>We are interested in comparing gene expression between the two groups defined in the sampleInfo table.</p>
+<p>Compute a p-value for each gene using the function rowttests from the genefilter package in Bioconductor.</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc3VtKHJvd3R0ZXN0cyhnZW5lRXhwcmVzc2lvbiwgYXMuZmFjdG9yKHNhbXBsZUluZm8kZ3JvdXApKSRwLnZhbHVlIDwgMC4wNSlcblxuYGBgIn0= -->
+<pre class="r"><code>sum(rowttests(geneExpression, as.factor(sampleInfo$group))$p.value &lt; 0.05)
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDEzODNcbiJ9 -->
+<pre><code>[1] 1383</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="fdr-exercises-2" class="section level3">
+<h3>FDR Exercises #2</h3>
+<p>Apply the Bonferroni correction to the p-values obtained in question #1 to achieve a FWER of 0.05. How many genes are called significant under this procedure?</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc3VtKHJvd3R0ZXN0cyhnZW5lRXhwcmVzc2lvbiwgYXMuZmFjdG9yKHNhbXBsZUluZm8kZ3JvdXApKSRwLnZhbHVlIDwgKDAuMDUvbnJvdyhnZW5lRXhwcmVzc2lvbikpKSBcbmBgYCJ9 -->
+<pre class="r"><code>sum(rowttests(geneExpression, as.factor(sampleInfo$group))$p.value &lt; (0.05/nrow(geneExpression))) </code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDEwXG4ifQ== -->
+<pre><code>[1] 10</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="fdr-exercises-3" class="section level3">
+<h3>FDR Exercises #3</h3>
+<p>Note that the FDR is a property of a list of features, not each specific feature. The q-value relates FDR to an individual feature. To define the q-value we order features we tested by p-value then compute the FDRs for a list with the most significant, the two most significant, the three most significant, etc… The FDR of the list with the, say, m most significant tests is defined as the q-value of the m-th most significant feature. In other words, the q-value of a feature, is the FDR of the biggest list that includes that gene.</p>
+<p>In R, we can compute the q-value using the <code>p.adjust</code> function with the FDR option. Read the help file for <code>p.adjust</code> and then, for our gene expression dataset, compute how many genes achieve an FDR &lt; 0.05</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucHZhbHMgPSByb3d0dGVzdHMoZ2VuZUV4cHJlc3Npb24sIGFzLmZhY3RvcihzYW1wbGVJbmZvJGdyb3VwKSkkcC52YWx1ZVxuc3VtKHAuYWRqdXN0KHB2YWxzLCBtZXRob2QgPSBcImZkclwiLCBuID0gbGVuZ3RoKHB2YWxzKSk8MC4wNSlcbmBgYCJ9 -->
+<pre class="r"><code>pvals = rowttests(geneExpression, as.factor(sampleInfo$group))$p.value
+sum(p.adjust(pvals, method = &quot;fdr&quot;, n = length(pvals))&lt;0.05)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDEzXG4ifQ== -->
+<pre><code>[1] 13</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="fdr-exercises-4" class="section level3">
+<h3>FDR Exercises #4</h3>
+<p>Now use the qvalue function, in the Bioconductor qvalue package, to estimate q-values using the procedure described by Storey.</p>
+<p>Using this estimate how many genes have q-values below 0.05?</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc3VtKHF2YWx1ZShwdmFscykkcXZhbHVlczwwLjA1KVxuXG5gYGAifQ== -->
+<pre class="r"><code>sum(qvalue(pvals)$qvalues&lt;0.05)
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDIyXG4ifQ== -->
+<pre><code>[1] 22</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="fdr-exercises-5" class="section level3">
+<h3>FDR Exercises #5</h3>
+<p>Read the help file for qvalue and report the estimated proportion of genes for which the null hypothesis is true <span class="math inline">\(\pi_{0} = m_{0}/m\)</span></p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucXZhbHVlKHB2YWxzKSRwaTBcbmBgYCJ9 -->
+<pre class="r"><code>qvalue(pvals)$pi0</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDAuNjY5NTczOVxuIn0= -->
+<pre><code>[1] 0.6695739</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="fdr-exercises-7" class="section level3">
+<h3>FDR Exercises #7</h3>
+<p>Note that this is an advanced question and that you can ask questions in the discussion forum.</p>
+<p>Create a Monte Carlo Simulation in which you simulate measurements from 8,793 genes for 24 samples: 12 cases and 12 controls.</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubiA8LSAyNFxubSA8LSA4NzkzXG5tYXQgPC0gbWF0cml4KHJub3JtKG4qbSksbSxuKVxuYGBgIn0= -->
+<pre class="r"><code>n &lt;- 24
+m &lt;- 8793
+mat &lt;- matrix(rnorm(n*m),m,n)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Now for 500 genes, there is a difference of 2 between cases and controls:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZGVsdGEgPC0gMlxucG9zaXRpdmVzIDwtIDUwMFxubWF0WzE6cG9zaXRpdmVzLDE6KG4vMildIDwtIG1hdFsxOnBvc2l0aXZlcywxOihuLzIpXStkZWx0YVxuYGBgIn0= -->
+<pre class="r"><code>delta &lt;- 2
+positives &lt;- 500
+mat[1:positives,1:(n/2)] &lt;- mat[1:positives,1:(n/2)]+delta</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>So the null hypothesis is true for 8793-500 genes. Using the notation from the videos m=8793, m0=8293 and m1=500</p>
+<p>Set the seed at 1, set.seed(1) and run this experiment 1,000 times with a Monte Carlo simulation. For each instance compute p-values using a t-test (using rowttests in the genefilter package) and create three lists of genes using:</p>
+<ul>
+<li>Bonferroni correction to achieve an FWER of 0.05,</li>
+</ul>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc2V0LnNlZWQoMSlcbmxpYnJhcnkocXZhbHVlKVxubGlicmFyeShnZW5lZmlsdGVyKVxubiA8LSAyNFxubSA8LSA4NzkzXG5tMD04MjkzXG5tMT01MDBcbkIgPC0gMTAwMFxuZGVsdGEgPC0yXG5wb3NpdGl2ZXMgPC0gNTAwXG5nIDwtIGZhY3RvcihyZXAoYygwLDEpLGVhY2g9MTIpKVxucmVzdWx0IDwtIHJlcGxpY2F0ZShCLHtcbiAgbWF0IDwtIG1hdHJpeChybm9ybShuKm0pLG0sbilcbiAgbWF0WzE6cG9zaXRpdmVzLDE6KG4vMildIDwtIG1hdFsxOnBvc2l0aXZlcywxOihuLzIpXStkZWx0YVxuICBwdmFscyA9IHJvd3R0ZXN0cyhtYXQsZykkcC52YWxcbiAgIyNCb25mZXJyb25pXG4gIEZQMSA8LSBzdW0ocHZhbHNbKDE6cG9zaXRpdmVzKV08PTAuMDUvbSkgIFxuICB9KVxubWVhbihyZXN1bHQvbTApXG5gYGAifQ== -->
+<pre class="r"><code>set.seed(1)
+library(qvalue)
+library(genefilter)
+n &lt;- 24
+m &lt;- 8793
+m0=8293
+m1=500
+B &lt;- 1000
+delta &lt;-2
+positives &lt;- 500
+g &lt;- factor(rep(c(0,1),each=12))
+result &lt;- replicate(B,{
+  mat &lt;- matrix(rnorm(n*m),m,n)
+  mat[1:positives,1:(n/2)] &lt;- mat[1:positives,1:(n/2)]+delta
+  pvals = rowttests(mat,g)$p.val
+  ##Bonferroni
+  FP1 &lt;- sum(pvals[(1:positives)]&lt;=0.05/m)  
+  })
+mean(result/m0)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDAuMDE0MjczOTdcbiJ9 -->
+<pre><code>[1] 0.01427397</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<ul>
+<li>p-adjust estimates of FDR to achieve an FDR of 0.05, and</li>
+<li>qvalue estimates of FDR to to achieve an FDR of 0.05.</li>
+</ul>
+<p>For each of these three lists compute the number of false positives in the list and the number of false negatives: genes not in the list that should have been because the null hypothesis is not true (we added 2 to the controls to create the cases).</p>
+<p>What is the false positive rate (false positives divided by m0) if we use Bonferroni?</p>
+</div>
+<div id="fdr-exercises-8" class="section level3">
+<h3>FDR Exercises #8</h3>
+<p>From the same Monte Carlo simulation as in the question above, what is the false negative rate if we use Bonferroni?</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubWVhbihyZXN1bHRbMixdL20xKVxuXG5gYGAifQ== -->
+<pre class="r"><code>mean(result[2,]/m1)
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDAuNzYzMjUyXG4ifQ== -->
+<pre><code>[1] 0.763252</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="fdr-exercises-9" class="section level3">
+<h3>FDR Exercises #9</h3>
+<p>From the same Monte Carlo simulation as in question #7, what is the false positive rate if we use q-values from p.adjust?</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc2V0LnNlZWQoMSlcbmxpYnJhcnkocXZhbHVlKVxubGlicmFyeShnZW5lZmlsdGVyKVxubiA8LSAyNFxubSA8LSA4NzkzXG5tMD04MjkzXG5tMT01MDBcbkIgPC0gMTAwMFxuZGVsdGEgPC0yXG5wb3NpdGl2ZXMgPC0gNTAwXG5nIDwtIGZhY3RvcihyZXAoYygwLDEpLGVhY2g9MTIpKVxucmVzdWx0IDwtIHJlcGxpY2F0ZShCLHtcbiAgbWF0IDwtIG1hdHJpeChybm9ybShuKm0pLG0sbilcbiAgbWF0WzE6cG9zaXRpdmVzLDE6KG4vMildIDwtIG1hdFsxOnBvc2l0aXZlcywxOihuLzIpXStkZWx0YVxuICBwdmFscyA9IHJvd3R0ZXN0cyhtYXQsZykkcC52YWxcbiAgcGFkaiA9IHAuYWRqdXN0KHB2YWxzLCBtZXRob2QgPSBcImZkclwiLCBuID0gbSlcbiAgRlAxIDwtIHN1bShwYWRqWy0oMTpwb3NpdGl2ZXMpXTw9MC4wNSlcbiAgfSlcbm1lYW4ocmVzdWx0L20wKVxuYGBgIn0= -->
+<pre class="r"><code>set.seed(1)
+library(qvalue)
+library(genefilter)
+n &lt;- 24
+m &lt;- 8793
+m0=8293
+m1=500
+B &lt;- 1000
+delta &lt;-2
+positives &lt;- 500
+g &lt;- factor(rep(c(0,1),each=12))
+result &lt;- replicate(B,{
+  mat &lt;- matrix(rnorm(n*m),m,n)
+  mat[1:positives,1:(n/2)] &lt;- mat[1:positives,1:(n/2)]+delta
+  pvals = rowttests(mat,g)$p.val
+  padj = p.adjust(pvals, method = &quot;fdr&quot;, n = m)
+  FP1 &lt;- sum(padj[-(1:positives)]&lt;=0.05)
+  })
+mean(result/m0)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDAuMDAyNzM3ODUxXG4ifQ== -->
+<pre><code>[1] 0.002737851</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>FDR Exercises #10</p>
+<p>From the same Monte Carlo simulation as in question #7, what is the false negative rate if we use q-values from p.adjust?</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc2V0LnNlZWQoMSlcbmxpYnJhcnkocXZhbHVlKVxubGlicmFyeShnZW5lZmlsdGVyKVxubiA8LSAyNFxubSA8LSA4NzkzXG5tMD04MjkzXG5tMT01MDBcbkIgPC0gMTAwMFxuZGVsdGEgPC0yXG5wb3NpdGl2ZXMgPC0gNTAwXG5nIDwtIGZhY3RvcihyZXAoYygwLDEpLGVhY2g9MTIpKVxucmVzdWx0IDwtIHJlcGxpY2F0ZShCLHtcbiAgbWF0IDwtIG1hdHJpeChybm9ybShuKm0pLG0sbilcbiAgbWF0WzE6cG9zaXRpdmVzLDE6KG4vMildIDwtIG1hdFsxOnBvc2l0aXZlcywxOihuLzIpXStkZWx0YVxuICBwdmFscyA9IHJvd3R0ZXN0cyhtYXQsZykkcC52YWxcbiAgcGFkaiA9IHAuYWRqdXN0KHB2YWxzLCBtZXRob2QgPSBcImZkclwiLCBuID0gbSlcbiAgRlAxIDwtIHN1bShwYWRqWy0oMTpwb3NpdGl2ZXMpXTw9MC4wNSlcbiAgRk4xIDwtIHN1bShwYWRqWzE6cG9zaXRpdmVzXT4wLjA1KVxuICBjKEZQMSxGTjEpXG4gIH0pXG5tZWFuKHJlc3VsdFsyLF0vbTEpXG5gYGAifQ== -->
+<pre class="r"><code>set.seed(1)
+library(qvalue)
+library(genefilter)
+n &lt;- 24
+m &lt;- 8793
+m0=8293
+m1=500
+B &lt;- 1000
+delta &lt;-2
+positives &lt;- 500
+g &lt;- factor(rep(c(0,1),each=12))
+result &lt;- replicate(B,{
+  mat &lt;- matrix(rnorm(n*m),m,n)
+  mat[1:positives,1:(n/2)] &lt;- mat[1:positives,1:(n/2)]+delta
+  pvals = rowttests(mat,g)$p.val
+  padj = p.adjust(pvals, method = &quot;fdr&quot;, n = m)
+  FP1 &lt;- sum(padj[-(1:positives)]&lt;=0.05)
+  FN1 &lt;- sum(padj[1:positives]&gt;0.05)
+  c(FP1,FN1)
+  })
+mean(result[2,]/m1)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDAuMDgxNDE4XG4ifQ== -->
+<pre><code>[1] 0.081418</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="fdr-exercises-11" class="section level3">
+<h3>FDR Exercises #11</h3>
+<p>From the same Monte Carlo simulation as in question #7, what is the false positive rate if we use q-values from qvalue function?</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc2V0LnNlZWQoMSlcbmxpYnJhcnkocXZhbHVlKVxubGlicmFyeShnZW5lZmlsdGVyKVxubiA8LSAyNFxubSA8LSA4NzkzXG5tMD04MjkzXG5tMT01MDBcbkIgPC0gMTAwMFxuZGVsdGEgPC0yXG5wb3NpdGl2ZXMgPC0gNTAwXG5nIDwtIGZhY3RvcihyZXAoYygwLDEpLGVhY2g9MTIpKVxucmVzdWx0IDwtIHJlcGxpY2F0ZShCLHtcbiAgbWF0IDwtIG1hdHJpeChybm9ybShuKm0pLG0sbilcbiAgbWF0WzE6cG9zaXRpdmVzLDE6KG4vMildIDwtIG1hdFsxOnBvc2l0aXZlcywxOihuLzIpXStkZWx0YVxuICBwdmFscyA9IHJvd3R0ZXN0cyhtYXQsZykkcC52YWxcbiAgcGFkaiA9IHF2YWx1ZShwdmFscykkcXZhbHVlc1xuICBGUDEgPC0gc3VtKHBhZGpbLSgxOnBvc2l0aXZlcyldPD0wLjA1KVxuICBGTjEgPC0gc3VtKHBhZGpbMTpwb3NpdGl2ZXNdPjAuMDUpXG4gIGMoRlAxLEZOMSlcbiAgfSlcbm1lYW4ocmVzdWx0WzEsXS9tMClcbmBgYCJ9 -->
+<pre class="r"><code>set.seed(1)
+library(qvalue)
+library(genefilter)
+n &lt;- 24
+m &lt;- 8793
+m0=8293
+m1=500
+B &lt;- 1000
+delta &lt;-2
+positives &lt;- 500
+g &lt;- factor(rep(c(0,1),each=12))
+result &lt;- replicate(B,{
+  mat &lt;- matrix(rnorm(n*m),m,n)
+  mat[1:positives,1:(n/2)] &lt;- mat[1:positives,1:(n/2)]+delta
+  pvals = rowttests(mat,g)$p.val
+  padj = qvalue(pvals)$qvalues
+  FP1 &lt;- sum(padj[-(1:positives)]&lt;=0.05)
+  FN1 &lt;- sum(padj[1:positives]&gt;0.05)
+  c(FP1,FN1)
+  })
+mean(result[1,]/m0)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDAuMDAyOTMzMDc2XG4ifQ== -->
+<pre><code>[1] 0.002933076</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="fdr-exercises-12" class="section level3">
+<h3>FDR Exercises #12</h3>
+<p>From the same Monte Carlo simulation as in question #7, what is the false negative rate if we use q-values from qvalue function?</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc2V0LnNlZWQoMSlcbmxpYnJhcnkocXZhbHVlKVxubGlicmFyeShnZW5lZmlsdGVyKVxubiA8LSAyNFxubSA8LSA4NzkzXG5tMD04MjkzXG5tMT01MDBcbkIgPC0gMTAwMFxuZGVsdGEgPC0yXG5wb3NpdGl2ZXMgPC0gNTAwXG5nIDwtIGZhY3RvcihyZXAoYygwLDEpLGVhY2g9MTIpKVxucmVzdWx0IDwtIHJlcGxpY2F0ZShCLHtcbiAgbWF0IDwtIG1hdHJpeChybm9ybShuKm0pLG0sbilcbiAgbWF0WzE6cG9zaXRpdmVzLDE6KG4vMildIDwtIG1hdFsxOnBvc2l0aXZlcywxOihuLzIpXStkZWx0YVxuICBwdmFscyA9IHJvd3R0ZXN0cyhtYXQsZykkcC52YWxcbiAgcGFkaiA9IHF2YWx1ZShwdmFscykkcXZhbHVlc1xuICBGUDEgPC0gc3VtKHBhZGpbLSgxOnBvc2l0aXZlcyldPD0wLjA1KVxuICBGTjEgPC0gc3VtKHBhZGpbMTpwb3NpdGl2ZXNdPjAuMDUpXG4gIGMoRlAxLEZOMSlcbiAgfSlcbm1lYW4ocmVzdWx0WzIsXS9tMSlcbmBgYCJ9 -->
+<pre class="r"><code>set.seed(1)
+library(qvalue)
+library(genefilter)
+n &lt;- 24
+m &lt;- 8793
+m0=8293
+m1=500
+B &lt;- 1000
+delta &lt;-2
+positives &lt;- 500
+g &lt;- factor(rep(c(0,1),each=12))
+result &lt;- replicate(B,{
+  mat &lt;- matrix(rnorm(n*m),m,n)
+  mat[1:positives,1:(n/2)] &lt;- mat[1:positives,1:(n/2)]+delta
+  pvals = rowttests(mat,g)$p.val
+  padj = qvalue(pvals)$qvalues
+  FP1 &lt;- sum(padj[-(1:positives)]&lt;=0.05)
+  FN1 &lt;- sum(padj[1:positives]&gt;0.05)
+  c(FP1,FN1)
+  })
+mean(result[2,]/m1)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDAuMDc3MzAyXG4ifQ== -->
+<pre><code>[1] 0.077302</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+</div>
 </div>
 </div>
 
-<div id="rmd-source-code">LS0tCnRpdGxlOiAiUiBFeGVyY2ljZXMgUEg1MjUuM3giCm91dHB1dDogaHRtbF9ub3RlYm9vawotLS0KI1dFRUsgMQoKIyMgUiBSZWZyZXNoZXIgRXhlcmNpc2VzCiMjIyBSIFJlZnJlc2hlciBFeGVyY2lzZXMgIzEKCkRvd25sb2FkIGFuZCBpbnN0YWxsIHRoZSBHU0U1ODU5U3Vic2V0IHBhY2thZ2UgdGhlbiBsb2FkIHRoZSBkYXRhLgoKCmBgYHtyfQpsaWJyYXJ5KGRldnRvb2xzKQppbnN0YWxsX2dpdGh1YigiZ2Vub21pY3NjbGFzcy9HU0U1ODU5U3Vic2V0IikKbGlicmFyeShHU0U1ODU5U3Vic2V0KQpkYXRhKEdTRTU4NTlTdWJzZXQpICMjdGhpcyBsb2FkcyB0aGUgdGhyZWUgdGFibGVzCmBgYAoKCkhvdyBtYW55IHNhbXBsZXMgd2hlcmUgcHJvY2Vzc2VkIG9uIDIwMDUtMDYtMjc/CgoKYGBge3J9Cmxlbmd0aChncmVwKCcyMDA1LTA2LTI3Jywgc2FtcGxlSW5mbyRkYXRlKSkKYGBgCgojIyMgUiBSZWZyZXNoZXIgRXhlcmNpc2VzICMyCgpIb3cgbWFueSBvZiB0aGUgZ2VuZXMgcmVwcmVzZW50ZWQgaW4gdGhpcyBwYXJ0aWN1bGFyIHRlY2hub2xvZ3kgYXJlIG9uIGNocm9tb3NvbWUgWT8KCmBgYHtyfQpsZW5ndGgod2hpY2goZ2VuZUFubm90YXRpb24gPT0gImNoclkiKSkKYGBgCgojIyMgUiBSZWZyZXNoZXIgRXhlcmNpc2VzICMzCgpXaGF0IGlzIHRoZSBsb2cgZXhwcmVzc2lvbiB2YWx1ZSBvZiB0aGUgZm9yIGdlbmUgQVJQQzFBIG9uIHRoZSBvbmUgc3ViamVjdCB0aGF0IHdlIG1lYXN1cmVkIG9uIDIwMDUtMDYtMTA/CgpgYGB7cn0KcGlkID0gZ2VuZUFubm90YXRpb24kUFJPQkVJRFt3aGljaChnZW5lQW5ub3RhdGlvbiRTWU1CT0w9PSAnQVJQQzFBJyldCnNhbURhdGUgPSBzYW1wbGVJbmZvJGZpbGVuYW1lWyhncmVwKCcyMDA1LTA2LTEwJywgc2FtcGxlSW5mbyRkYXRlKSldCgpnZW5lRXhwcmVzc2lvbltwaWQsc2FtRGF0ZV0KYGBgCgoKIyMjIFIgUmVmcmVzaGVyIEV4ZXJjaXNlcyAjNAoKVXNlIHRoZSBmdW5jdGlvbiBhcHBseSB0byBmaW5kIHRoZSBtZWRpYW4gdmFsdWUgb2YgZWFjaCBjb2x1bW4uIFdoYXQgaXMgdGhlIG1lZGlhbiB2YWx1ZSBvZiB0aGVzZSB2YWx1ZXM/CgpgYGB7cn0KZmlyc3RNZWQgPSBhcHBseShnZW5lRXhwcmVzc2lvbiwgMiwgbWVkaWFuKQpzZWNNZWQgPSBtZWRpYW4oZmlyc3RNZWQpCnNlY01lZApgYGAKCiMjIyAgUiBSZWZyZXNoZXIgRXhlcmNpc2VzICM1CgpUaGlzIHByb2JsZW0gaXMgbW9yZSBhZHZhbmNlZCB0aGFuIHRoZSBwcmV2aW91cyBvbmVzLiBOb3RlIHRoYXQgaXQgbWlnaHQgdGFrZSB5b3Ugc29tZSB0aW1lIHRvIHNvbHZlIGFuZCB5b3Ugc2hvdWxkIGZlZWwgZnJlZSB0byBzZWVrIGhlbHAgaW4gdGhlIGRpc2N1c3Npb24gZm9ydW0uIFRoZSBleGVyY2lzZXMgaXMgbWVhbnQgdG8gbW90aXZhdGUgeW91IHRvIGxlYXJuIGEgYW4gaW1wb3JhbnQgUiBza2lsbHM6IGNyZWF0aW5nIGZ1bmN0aW9ucyB0byB1c2Ugd2l0aCBhcHBseS4KCldyaXRlIGEgZnVuY3Rpb24gdGhhdCB0YWtlcyBhIHZlY3RvciBvZiB2YWx1ZXMgZSBhbmQgYSBiaW5hcnkgdmVjdG9yIGdyb3VwIGNvZGluZyB0d28gZ3JvdXBzLCBhbmQgcmV0dXJucyB0aGUgcC12YWx1ZSBmcm9tIGEgdC10ZXN0OiB0LnRlc3QoIGVbZ3JvdXA9PTFdLCBlW2dyb3VwPT0wXSkkcC52YWx1ZS4KCk5vdyBkZWZpbmUgZyB0byBjb2RlIGNhc2VzICgxKSBhbmQgY29udHJvbHMgKDApIGxpa2UgdGhpcyBnIDwtIGZhY3RvcihzYW1wbGVJbmZvJGdyb3VwKQoKTmV4dCB1c2UgdGhlIGZ1bmN0aW9uIGFwcGx5IHRvIHJ1biBhIHQtdGVzdCBmb3IgZWFjaCByb3cgb2YgZ2VuZUV4cHJlc3Npb24gYW5kIG9idGFpbiB0aGUgcC12YWx1ZS4gV2hhdCBpcyBzbWFsbGVzdCBwLXZhbHVlIGFtb25nIGFsbCB0aGVzZSB0LXRlc3RzPyAKCmBgYHtyfQoKdHB2YWwgPSBmdW5jdGlvbihlLCBncm91cCl7CiAgZ3JvdXAgPSBhcy5mYWN0b3IoZ3JvdXApCiAgcFZhbCA9IHQudGVzdChlW2dyb3VwPT0xXSwgZVtncm91cCA9PSAwXSkkcC52YWx1ZQogIHJldHVybihwVmFsKQp9CgplID0gcm5vcm0oMjApCmcwID0gYXMuZmFjdG9yKHNhbXBsZShjKDAsMSksIGxlbmd0aChlKSwgcmVwbGFjZSA9IFQpKQojIHQudGVzdChlW2cwPT0xXSwgZVtnMCA9PSAwXSkkcHZhbHVlCgpyZXMgPSB0cHZhbChlLCBnMCkKcmVzCgpnID0gZyA8LSBmYWN0b3Ioc2FtcGxlSW5mbyRncm91cCkKCnNvcnQoYXBwbHkoZ2VuZUV4cHJlc3Npb24sMSx0cHZhbCwgZykpWzFdCgoKYGBgCgojIyBJbmZlcmVuY2UgaW4gUHJhY3RpY2UgRXhlcmNpc2VzCiMjIyBJbmZlcmVuY2UgaW4gUHJhY3RpY2UgRXhlcmNpc2VzICMxCgpUaGVzZSBleGVyY2lzZXMgd2lsbCBoZWxwIGNsYXJpZnkgdGhhdCBwLXZhbHVlcyBhcmUgcmFuZG9tIHZhcmlhYmxlcyBhbmQgc29tZSBvZiB0aGUgcHJvcGVydGllcyBvZiB0aGVzZSBwLXZhbHVlcy4gTm90ZSB0aGF0IGp1c3QgbGlrZSB0aGUgc2FtcGxlIGF2ZXJhZ2UgaXMgYSByYW5kb20gdmFyaWFibGUgYmVjYXVzZSBpdCBpcyBiYXNlZCBvbiBhIHJhbmRvbSBzYW1wbGUsIHRoZSBwLXZhbHVlcyBhcmUgYmFzZWQgb24gcmFuZG9tIHZhcmlhYmxlcyAoc2FtcGxlIG1lYW4gYW5kIHNhbXBsZSBzdGFuZGFyZCBkZXZpYXRpb24gZm9yIGV4YW1wbGUpIGFuZCB0aHVzIGl0IGlzIGFsc28gYSByYW5kb20gdmFyaWFibGUuCgpUbyBzZWUgdGhpcywgbGV0J3Mgc2VlIGhvdyBwLXZhbHVlcyBjaGFuZ2Ugd2hlbiB3ZSB0YWtlIGRpZmZlcmVudCBzYW1wbGVzLgoKYGBge3J9CgpzZXQuc2VlZCgxKQpsaWJyYXJ5KGRvd25sb2FkZXIpCnVybCA9ICJodHRwczovL3Jhdy5naXRodWJ1c2VyY29udGVudC5jb20vZ2Vub21pY3NjbGFzcy9kYWdkYXRhL21hc3Rlci9pbnN0L2V4dGRhdGEvZmVtYWxlQ29udHJvbHNQb3B1bGF0aW9uLmNzdiIKZmlsZW5hbWUgPSAiZmVtYWxlQ29udHJvbHNQb3B1bGF0aW9uLmNzdiIKaWYgKCFmaWxlLmV4aXN0cyhmaWxlbmFtZSkpIHsKICBkb3dubG9hZCh1cmwsZGVzdGZpbGU9ZmlsZW5hbWUpCn0KcG9wdWxhdGlvbiA9IHJlYWQuY3N2KGZpbGVuYW1lKQpwdmFscyA8LSByZXBsaWNhdGUoMTAwMCx7CiAgY29udHJvbCA9IHNhbXBsZShwb3B1bGF0aW9uWywxXSwxMikKICB0cmVhdG1lbnQgPSBzYW1wbGUocG9wdWxhdGlvblssMV0sMTIpCiAgdC50ZXN0KHRyZWF0bWVudCxjb250cm9sKSRwLnZhbAp9KQpoZWFkKHB2YWxzKQpoaXN0KHB2YWxzKQogICAgCmBgYApXaGF0IHByb3BvcnRpb24gb2YgdGhlIHAtdmFsdWVzIGlzIGJlbG93IDAuMDU/CgpgYGB7cn0KbGVuZ3RoKHB2YWxzW3B2YWxzIDwgMC4wNV0pL2xlbmd0aChwdmFscykKYGBgCldoYXQgcHJvcG9ydGlvbiBvZiB0aGUgcC12YWx1ZXMgaXMgYmVsb3cgMC4wNT8KYGBge3J9Cmxlbmd0aChwdmFsc1twdmFscyA8IDAuMDFdKS9sZW5ndGgocHZhbHMpCmBgYAoKCiMjIyBJbmZlcmVuY2UgaW4gUHJhY3RpY2UgRXhlcmNpc2VzICMzIAoKQXNzdW1lIHlvdSBhcmUgdGVzdGluZyB0aGUgZWZmZWN0aXZlbmVzcyBvZiAyMCBkaWV0cyBvbiBtaWNlIHdlaWdodC4gRm9yIGVhY2ggb2YgdGhlIDIwIGRpZXRzIHlvdSBydW4gYW4gZXhwZXJpbWVudCB3aXRoIDEwIGNvbnRyb2wgbWljZSBhbmQgMTAgdHJlYXRlZCBtaWNlLiBBc3N1bWUgdGhlIG51bGwgaHlwb3RoZXNpcyB0aGF0IHRoZSBkaWV0IGhhcyBubyBlZmZlY3QgaXMgdHJ1ZSBmb3IgYWxsIDIwIGRpZXRzIGFuZCB0aGF0IG1pY2Ugd2VpZ2h0cyBmb2xsb3cgYSBub3JtYWwgZGlzdHJpYnV0aW9uIHdpdGggbWVhbiAzMCBncmFtcyBhbmQgYSBzdGFuZGFyZCBkZXZpYXRpb24gb2YgMiBncmFtcywgcnVuIGEgTW9udGUgQ2FybG8gc2ltdWxhdGlvbiBmb3Igb25lIG9mIHRoZXNlIHN0dWRpZXM6CgpgYGB7cn0KY2FzZXMgPSBybm9ybSgxMCwzMCwyKQpjb250cm9scyA9IHJub3JtKDEwLDMwLDIpCnQudGVzdChjYXNlcyxjb250cm9scykKYGBgCgoKCk5vdyBydW4gYSBNb250ZSBDYXJsbyBzaW11bGF0aW9uIGltaXRhdGluZyB0aGUgcmVzdWx0cyBmb3IgdGhlIGV4cGVyaW1lbnQgZm9yIGFsbCAyMCBkaWV0cy4gSWYgeW91IHNldCB0aGUgc2VlZCBhdCAxMDAsIHNldC5zZWVkKDEwMCksIGFuZCB1c2UgdGhlIHNhbWUgY29kZSBhcyBhYm92ZSBpbnNpZGUgYSBjYWxsIHRvIHJlcGxpY2F0ZSBob3cgbWFueSBvZiBwLXZhbHVlcyAobnVtYmVyIG5vdCBwcm9wb3J0aW9uKSBhcmUgYmVsb3cgMC4wNT8KCmBgYHtyfQpzZXQuc2VlZCgxMDApCgptb3VzZVB2YWwgPSBmdW5jdGlvbigpewogIGNhc2VzID0gcm5vcm0oMTAsMzAsMikKICBjb250cm9scyA9IHJub3JtKDEwLDMwLDIpCiAgcmV0dXJuKHQudGVzdChjYXNlcyxjb250cm9scykkcC52YWx1ZSkKfQoKcHZhbHMgPSBjKCkKZm9yIChpIGluIDE6MjApewogIHB2YWxzW2ldID0gbW91c2VQdmFsKCkKfQoKbGVuZ3RoKHB2YWxzW3B2YWxzIDwgMC4wNV0pCmBgYAoKIyMgSW5mZXJlbmNlIGluIFByYWN0aWNlIEV4ZXJjaXNlcyAjNAoKTm93IGNyZWF0ZSBhIHNpbXVsYXRpb24gdG8gbGVhcm4gYWJvdXQgdGhlIGRpc3RyaWJ1dGlvbiBvZiB0aGUgbnVtYmVyIG9mIHAtdmFsdWVzIHRoYXQgYXJlIGxlc3MgdGhhbiAwLjA1LiBJbiBxdWVzdGlvbiAxLjIuMyB3ZSByYW4gdGhlIDIwIGRpZXQgZXhwZXJpbWVudCBvbmNlLiBOb3cgd2Ugd2lsbCBydW4gdGhlc2UgMjAgZXhwZXJpbWVudHMgMSwwMDAgdGltZXMgYW5kIGVhY2ggdGltZSBzYXZlIHRoZSBudW1iZXIgb2YgcC12YWx1ZXMgdGhhdCBhcmUgbGVzcyB0aGFuIDAuMDUuCgpTZXQgdGhlIHNlZWQgYXQgMTAwIGFnYWluLCBzZXQuc2VlZCgxMDApLCBydW4gdGhlIGNvZGUgZnJvbSBRdWVzdGlvbiAxLjIuMyAxLDAwMCB0aW1lcywgYW5kIHNhdmUgdGhlIG51bWJlciBvZiB0aW1lcyB0aGUgcC12YWx1ZSBpcyBsZXNzIHRoYW4gMC4wNSBmb3IgZWFjaCBvZiB0aGUgMSwwMDAgaW5zdGFuY2VzLgoKV2hhdCBpcyB0aGUgYXZlcmFnZSBvZiB0aGVzZSAxLDAwMCBudW1iZXJzPyBOb3RlIHRoYXQgdGhpcyBpcyB0aGUgZXhwZWN0ZWQgbnVtYmVyIG9mIHRlc3RzIChvdXQgb2YgdGhlIDIwIHdlIHJ1bikgdGhhdCB3ZSB3aWxsIHJlamVjdCB3aGVuIHRoZSBudWxsIGlzIHRydWUuIChIaW50OiB1c2UgcmVwbGljYXRlIHR3aWNlKQoKCmBgYHtyfQpzZXQuc2VlZCgxMDApCgpsZW5WZWMgPSBjKCkKbW91c2VQdmFsID0gZnVuY3Rpb24oKXsKICBjYXNlcyA9IHJub3JtKDEwLDMwLDIpCiAgY29udHJvbHMgPSBybm9ybSgxMCwzMCwyKQogIHJldHVybih0LnRlc3QoY2FzZXMsY29udHJvbHMpJHAudmFsdWUpCn0KCmZvciAoaiBpbiAxOjEwMDApewogIHB2YWxzID0gYygpCiAgZm9yIChpIGluIDE6MjApewogICAgcHZhbHNbaV0gPSBtb3VzZVB2YWwoKQogIH0KCiAgbGVuVmVjW2pdID0gbGVuZ3RoKHB2YWxzW3B2YWxzIDwgMC4wNV0pCgp9CgptZWFuKGxlblZlYykKCiMgQ2FuIGFsc28gdXNlIHRoZSByZXBsaWNhdGUgZnVuY3Rpb24gOiByZXBsaWNhdGUobiAsIEZVTikKCmBgYAoKIyMgSW5mZXJlbmNlIGluIFByYWN0aWNlIEV4ZXJjaXNlcyAjNQoKCk5vdGUgdGhhdCB3aGF0IHRoZSBhbnN3ZXIgdG8gcXVlc3Rpb24gIzQgc2F5cyBpcyB0aGF0IG9uIGF2ZXJhZ2UsIHdlIGV4cGVjdCBzb21lIHAtdmFsdWUgdG8gYmUgMC4wNSBldmVuIHdoZW4gdGhlIG51bGwgaXMgdHJ1ZSBmb3IgYWxsIGRpZXRzLgoKVXNpbmcgdGhlIHNhbWUgc2ltdWxhdGlvbiBkYXRhIGZyb20gdGhlIHF1ZXN0aW9uIGFib3ZlLCBmb3Igd2hhdCBwcm9wb3J0aW9uIG9mIHRoZSAxLDAwMCByZXBsaWNhdGlvbnMgZG8gd2UgcmVqZWN0IHRoZSBudWxsIGh5cG90aGVzaXMgYXQgbGVhc3Qgb25jZSAobW9yZSB0aGFuIDAgZmFsc2UgcG9zaXRpdmVzKT8gKEVudGVyIHlvdXIgcmVzcG9uc2UgYXMgYSBkZWNpbWFsIHZhbHVlIC0tIGkuZS4gMC4xMCBmb3IgMTAlLikKCmBgYHtyfQpsZW5ndGgod2hpY2gobGVuVmVjID49IDEgKSkvbGVuZ3RoKGxlblZlYykKYGBgCgoKIyBXRUVLIDIKCldoaWNoIHByb2NlZHVyZSBpcyBtb3JlIGNvbnNlcnZhdGl2ZSAocGlja3MgbGVzcyBnZW5lcywgaS5lLiByZWplY3RzIGxlc3MgbnVsbCBoeXBvdGhlc2lzKTogQm9uZmVycm9uaSdzIG9yIFNpZGFrJ3M/Ck1ha2UgYSBwbG90IG9mICRcYWxwaGEvbSQgYW5kICQxLSgxLVxhbHBoYSleezEvbX0kIGFuZCBmb3IgdmFyaW91cyB2YWx1ZXMgb2YgbT4xLiAKCmBgYHtyfQphbHBoYSA8LSBzZXEoMCwwLjI1LDAuMDEpCm0gPSAxOjEwMDAwCmJvbmZlcnJvbmkgPSBhbHBoYS9tCnNpZGFrID0gMS0oMSAtIGFscGhhKSoqKDEvbSkKcGxvdChtLCBzaWRhaywgY29sID0gInJlZCIsIHlsYWIgPSAiayIsIHBjaCA9IDIwKQpwb2ludHMobSwgYm9uZmVycm9uaSwgY29sID0gImdyZWVuIiwgcGNoID0gMjEpCmBgYAoKIyMjIEJvbmZlcnJvbmkgQ29ycmVjdGlvbiBFeGVyY2lzZXMgIzIgKE1vbnRlIENhcmxvIFNpbXVsYXRpb24pIAoKTW9udGUgQ2FybG8gc2ltdWxhdGlvbi4gVG8gc2ltdWxhdGUgdGhlIHAtdmFsdWUgcmVzdWx0cyBvZiwgc2F5LCA4LDc5MyB0LXRlc3RzIGZvciB3aGljaCB0aGUgbnVsbCBpcyB0cnVlIHdlIGRvbid0IGFjdHVhbCBoYXZlIHRvIGdlbmVyYXRlIHRoZSBvcmlnaW5hbCBkYXRhLiBBcyB3ZSBsZWFybmVkIGluIGNsYXNzIHdlIGNhbiBnZW5lcmF0ZSBwLXZhbHVlcyBmcm9tIGEgdW5pZm9ybSBkaXN0cmlidXRpb24gbGlrZSB0aGlzOgoKYHB2YWxzIDwtIHJ1bmlmKDg3OTMsMCwxKWAKClVzaW5nIHdoYXQgd2UgaGF2ZSBsZWFybmVkLCBzZXQgdGhlIGN1dG9mZiB1c2luZyB0aGUgQm9uZmVycm9uaSBjb3JyZWN0aW9uIHRoYXQgZ3VhcmFudGVlcyBhbiBGV0VSIGxvd2VyIHRoYW4gMC4wNSBhbmQgcmVwb3J0IGJhY2sgdGhlIEZXRVIuIFNldCB0aGUgc2VlZCBhdCAxLCBgc2V0LnNlZWQoMSlgIGFuZCBydW4gMTAsMDAwIHNpbXVsYXRpb24uIFJlcG9ydCB0aGUgTW9udGUgQ2FybG8gZXN0aW1hdGUgb2YgdGhlIEZXRVIgYmVsb3cuCgpgYGB7cn0Kc2V0LnNlZWQoMSkKYWxwaGEgPSAwLjA1Cm0gPSA4NzkzCmsgPSBhbHBoYS9tCmVzdGltYXRlID0gYygpCmZvciAoaSBpbiAxOjEwMDAwKXsKICBwdmFscyA8LSBydW5pZihtLDAsMSkKICBlc3RpbWF0ZVtpXSA9IHN1bShwdmFsczxrKQp9CgptZWFuKGVzdGltYXRlKQoKCmBgYAoKVXNpbmcgdGhlIHNhbWUgc2VlZCByZXBlYXQgdGhlIGFib3ZlIGZvciBTaWRhaydzIGN1dG9mZi4gCgoKYGBge3J9CnNldC5zZWVkKDEpCmFscGhhID0gMC4wNQptID0gODc5MwprID0gMS0oMSAtIGFscGhhKSoqKDEvbSkKZXN0aW1hdGUgPSBjKCkKZm9yIChpIGluIDE6MTAwMDApewogIHB2YWxzIDwtIHJ1bmlmKG0sMCwxKQogIGVzdGltYXRlW2ldID0gc3VtKHB2YWxzPGspCn0KCm1lYW4oZXN0aW1hdGUpCgpgYGAKCg==</div>
+<div id="rmd-source-code">LS0tCnRpdGxlOiAiUiBFeGVyY2ljZXMgUEg1MjUuM3giCm91dHB1dDogaHRtbF9ub3RlYm9vawotLS0KI1dFRUsgMQoKIyMgUiBSZWZyZXNoZXIgRXhlcmNpc2VzCiMjIyBSIFJlZnJlc2hlciBFeGVyY2lzZXMgIzEKCkRvd25sb2FkIGFuZCBpbnN0YWxsIHRoZSBHU0U1ODU5U3Vic2V0IHBhY2thZ2UgdGhlbiBsb2FkIHRoZSBkYXRhLgoKCmBgYHtyfQpsaWJyYXJ5KGRldnRvb2xzKQppbnN0YWxsX2dpdGh1YigiZ2Vub21pY3NjbGFzcy9HU0U1ODU5U3Vic2V0IikKbGlicmFyeShHU0U1ODU5U3Vic2V0KQpkYXRhKEdTRTU4NTlTdWJzZXQpICMjdGhpcyBsb2FkcyB0aGUgdGhyZWUgdGFibGVzCmBgYAoKCkhvdyBtYW55IHNhbXBsZXMgd2hlcmUgcHJvY2Vzc2VkIG9uIDIwMDUtMDYtMjc/CgoKYGBge3J9Cmxlbmd0aChncmVwKCcyMDA1LTA2LTI3Jywgc2FtcGxlSW5mbyRkYXRlKSkKYGBgCgojIyMgUiBSZWZyZXNoZXIgRXhlcmNpc2VzICMyCgpIb3cgbWFueSBvZiB0aGUgZ2VuZXMgcmVwcmVzZW50ZWQgaW4gdGhpcyBwYXJ0aWN1bGFyIHRlY2hub2xvZ3kgYXJlIG9uIGNocm9tb3NvbWUgWT8KCmBgYHtyfQpsZW5ndGgod2hpY2goZ2VuZUFubm90YXRpb24gPT0gImNoclkiKSkKYGBgCgojIyMgUiBSZWZyZXNoZXIgRXhlcmNpc2VzICMzCgpXaGF0IGlzIHRoZSBsb2cgZXhwcmVzc2lvbiB2YWx1ZSBvZiB0aGUgZm9yIGdlbmUgQVJQQzFBIG9uIHRoZSBvbmUgc3ViamVjdCB0aGF0IHdlIG1lYXN1cmVkIG9uIDIwMDUtMDYtMTA/CgpgYGB7cn0KcGlkID0gZ2VuZUFubm90YXRpb24kUFJPQkVJRFt3aGljaChnZW5lQW5ub3RhdGlvbiRTWU1CT0w9PSAnQVJQQzFBJyldCnNhbURhdGUgPSBzYW1wbGVJbmZvJGZpbGVuYW1lWyhncmVwKCcyMDA1LTA2LTEwJywgc2FtcGxlSW5mbyRkYXRlKSldCgpnZW5lRXhwcmVzc2lvbltwaWQsc2FtRGF0ZV0KYGBgCgoKIyMjIFIgUmVmcmVzaGVyIEV4ZXJjaXNlcyAjNAoKVXNlIHRoZSBmdW5jdGlvbiBhcHBseSB0byBmaW5kIHRoZSBtZWRpYW4gdmFsdWUgb2YgZWFjaCBjb2x1bW4uIFdoYXQgaXMgdGhlIG1lZGlhbiB2YWx1ZSBvZiB0aGVzZSB2YWx1ZXM/CgpgYGB7cn0KZmlyc3RNZWQgPSBhcHBseShnZW5lRXhwcmVzc2lvbiwgMiwgbWVkaWFuKQpzZWNNZWQgPSBtZWRpYW4oZmlyc3RNZWQpCnNlY01lZApgYGAKCiMjIyAgUiBSZWZyZXNoZXIgRXhlcmNpc2VzICM1CgpUaGlzIHByb2JsZW0gaXMgbW9yZSBhZHZhbmNlZCB0aGFuIHRoZSBwcmV2aW91cyBvbmVzLiBOb3RlIHRoYXQgaXQgbWlnaHQgdGFrZSB5b3Ugc29tZSB0aW1lIHRvIHNvbHZlIGFuZCB5b3Ugc2hvdWxkIGZlZWwgZnJlZSB0byBzZWVrIGhlbHAgaW4gdGhlIGRpc2N1c3Npb24gZm9ydW0uIFRoZSBleGVyY2lzZXMgaXMgbWVhbnQgdG8gbW90aXZhdGUgeW91IHRvIGxlYXJuIGEgYW4gaW1wb3JhbnQgUiBza2lsbHM6IGNyZWF0aW5nIGZ1bmN0aW9ucyB0byB1c2Ugd2l0aCBhcHBseS4KCldyaXRlIGEgZnVuY3Rpb24gdGhhdCB0YWtlcyBhIHZlY3RvciBvZiB2YWx1ZXMgZSBhbmQgYSBiaW5hcnkgdmVjdG9yIGdyb3VwIGNvZGluZyB0d28gZ3JvdXBzLCBhbmQgcmV0dXJucyB0aGUgcC12YWx1ZSBmcm9tIGEgdC10ZXN0OiB0LnRlc3QoIGVbZ3JvdXA9PTFdLCBlW2dyb3VwPT0wXSkkcC52YWx1ZS4KCk5vdyBkZWZpbmUgZyB0byBjb2RlIGNhc2VzICgxKSBhbmQgY29udHJvbHMgKDApIGxpa2UgdGhpcyBnIDwtIGZhY3RvcihzYW1wbGVJbmZvJGdyb3VwKQoKTmV4dCB1c2UgdGhlIGZ1bmN0aW9uIGFwcGx5IHRvIHJ1biBhIHQtdGVzdCBmb3IgZWFjaCByb3cgb2YgZ2VuZUV4cHJlc3Npb24gYW5kIG9idGFpbiB0aGUgcC12YWx1ZS4gV2hhdCBpcyBzbWFsbGVzdCBwLXZhbHVlIGFtb25nIGFsbCB0aGVzZSB0LXRlc3RzPyAKCmBgYHtyfQoKdHB2YWwgPSBmdW5jdGlvbihlLCBncm91cCl7CiAgZ3JvdXAgPSBhcy5mYWN0b3IoZ3JvdXApCiAgcFZhbCA9IHQudGVzdChlW2dyb3VwPT0xXSwgZVtncm91cCA9PSAwXSkkcC52YWx1ZQogIHJldHVybihwVmFsKQp9CgplID0gcm5vcm0oMjApCmcwID0gYXMuZmFjdG9yKHNhbXBsZShjKDAsMSksIGxlbmd0aChlKSwgcmVwbGFjZSA9IFQpKQojIHQudGVzdChlW2cwPT0xXSwgZVtnMCA9PSAwXSkkcHZhbHVlCgpyZXMgPSB0cHZhbChlLCBnMCkKcmVzCgpnID0gZyA8LSBmYWN0b3Ioc2FtcGxlSW5mbyRncm91cCkKCnNvcnQoYXBwbHkoZ2VuZUV4cHJlc3Npb24sMSx0cHZhbCwgZykpWzFdCgoKYGBgCgojIyBJbmZlcmVuY2UgaW4gUHJhY3RpY2UgRXhlcmNpc2VzCiMjIyBJbmZlcmVuY2UgaW4gUHJhY3RpY2UgRXhlcmNpc2VzICMxCgpUaGVzZSBleGVyY2lzZXMgd2lsbCBoZWxwIGNsYXJpZnkgdGhhdCBwLXZhbHVlcyBhcmUgcmFuZG9tIHZhcmlhYmxlcyBhbmQgc29tZSBvZiB0aGUgcHJvcGVydGllcyBvZiB0aGVzZSBwLXZhbHVlcy4gTm90ZSB0aGF0IGp1c3QgbGlrZSB0aGUgc2FtcGxlIGF2ZXJhZ2UgaXMgYSByYW5kb20gdmFyaWFibGUgYmVjYXVzZSBpdCBpcyBiYXNlZCBvbiBhIHJhbmRvbSBzYW1wbGUsIHRoZSBwLXZhbHVlcyBhcmUgYmFzZWQgb24gcmFuZG9tIHZhcmlhYmxlcyAoc2FtcGxlIG1lYW4gYW5kIHNhbXBsZSBzdGFuZGFyZCBkZXZpYXRpb24gZm9yIGV4YW1wbGUpIGFuZCB0aHVzIGl0IGlzIGFsc28gYSByYW5kb20gdmFyaWFibGUuCgpUbyBzZWUgdGhpcywgbGV0J3Mgc2VlIGhvdyBwLXZhbHVlcyBjaGFuZ2Ugd2hlbiB3ZSB0YWtlIGRpZmZlcmVudCBzYW1wbGVzLgoKYGBge3J9CgpzZXQuc2VlZCgxKQpsaWJyYXJ5KGRvd25sb2FkZXIpCnVybCA9ICJodHRwczovL3Jhdy5naXRodWJ1c2VyY29udGVudC5jb20vZ2Vub21pY3NjbGFzcy9kYWdkYXRhL21hc3Rlci9pbnN0L2V4dGRhdGEvZmVtYWxlQ29udHJvbHNQb3B1bGF0aW9uLmNzdiIKZmlsZW5hbWUgPSAiZmVtYWxlQ29udHJvbHNQb3B1bGF0aW9uLmNzdiIKaWYgKCFmaWxlLmV4aXN0cyhmaWxlbmFtZSkpIHsKICBkb3dubG9hZCh1cmwsZGVzdGZpbGU9ZmlsZW5hbWUpCn0KcG9wdWxhdGlvbiA9IHJlYWQuY3N2KGZpbGVuYW1lKQpwdmFscyA8LSByZXBsaWNhdGUoMTAwMCx7CiAgY29udHJvbCA9IHNhbXBsZShwb3B1bGF0aW9uWywxXSwxMikKICB0cmVhdG1lbnQgPSBzYW1wbGUocG9wdWxhdGlvblssMV0sMTIpCiAgdC50ZXN0KHRyZWF0bWVudCxjb250cm9sKSRwLnZhbAp9KQpoZWFkKHB2YWxzKQpoaXN0KHB2YWxzKQogICAgCmBgYApXaGF0IHByb3BvcnRpb24gb2YgdGhlIHAtdmFsdWVzIGlzIGJlbG93IDAuMDU/CgpgYGB7cn0KbGVuZ3RoKHB2YWxzW3B2YWxzIDwgMC4wNV0pL2xlbmd0aChwdmFscykKYGBgCldoYXQgcHJvcG9ydGlvbiBvZiB0aGUgcC12YWx1ZXMgaXMgYmVsb3cgMC4wNT8KYGBge3J9Cmxlbmd0aChwdmFsc1twdmFscyA8IDAuMDFdKS9sZW5ndGgocHZhbHMpCmBgYAoKCiMjIyBJbmZlcmVuY2UgaW4gUHJhY3RpY2UgRXhlcmNpc2VzICMzIAoKQXNzdW1lIHlvdSBhcmUgdGVzdGluZyB0aGUgZWZmZWN0aXZlbmVzcyBvZiAyMCBkaWV0cyBvbiBtaWNlIHdlaWdodC4gRm9yIGVhY2ggb2YgdGhlIDIwIGRpZXRzIHlvdSBydW4gYW4gZXhwZXJpbWVudCB3aXRoIDEwIGNvbnRyb2wgbWljZSBhbmQgMTAgdHJlYXRlZCBtaWNlLiBBc3N1bWUgdGhlIG51bGwgaHlwb3RoZXNpcyB0aGF0IHRoZSBkaWV0IGhhcyBubyBlZmZlY3QgaXMgdHJ1ZSBmb3IgYWxsIDIwIGRpZXRzIGFuZCB0aGF0IG1pY2Ugd2VpZ2h0cyBmb2xsb3cgYSBub3JtYWwgZGlzdHJpYnV0aW9uIHdpdGggbWVhbiAzMCBncmFtcyBhbmQgYSBzdGFuZGFyZCBkZXZpYXRpb24gb2YgMiBncmFtcywgcnVuIGEgTW9udGUgQ2FybG8gc2ltdWxhdGlvbiBmb3Igb25lIG9mIHRoZXNlIHN0dWRpZXM6CgpgYGB7cn0KY2FzZXMgPSBybm9ybSgxMCwzMCwyKQpjb250cm9scyA9IHJub3JtKDEwLDMwLDIpCnQudGVzdChjYXNlcyxjb250cm9scykKYGBgCgoKCk5vdyBydW4gYSBNb250ZSBDYXJsbyBzaW11bGF0aW9uIGltaXRhdGluZyB0aGUgcmVzdWx0cyBmb3IgdGhlIGV4cGVyaW1lbnQgZm9yIGFsbCAyMCBkaWV0cy4gSWYgeW91IHNldCB0aGUgc2VlZCBhdCAxMDAsIHNldC5zZWVkKDEwMCksIGFuZCB1c2UgdGhlIHNhbWUgY29kZSBhcyBhYm92ZSBpbnNpZGUgYSBjYWxsIHRvIHJlcGxpY2F0ZSBob3cgbWFueSBvZiBwLXZhbHVlcyAobnVtYmVyIG5vdCBwcm9wb3J0aW9uKSBhcmUgYmVsb3cgMC4wNT8KCmBgYHtyfQpzZXQuc2VlZCgxMDApCgptb3VzZVB2YWwgPSBmdW5jdGlvbigpewogIGNhc2VzID0gcm5vcm0oMTAsMzAsMikKICBjb250cm9scyA9IHJub3JtKDEwLDMwLDIpCiAgcmV0dXJuKHQudGVzdChjYXNlcyxjb250cm9scykkcC52YWx1ZSkKfQoKcHZhbHMgPSBjKCkKZm9yIChpIGluIDE6MjApewogIHB2YWxzW2ldID0gbW91c2VQdmFsKCkKfQoKbGVuZ3RoKHB2YWxzW3B2YWxzIDwgMC4wNV0pCmBgYAoKIyMgSW5mZXJlbmNlIGluIFByYWN0aWNlIEV4ZXJjaXNlcyAjNAoKTm93IGNyZWF0ZSBhIHNpbXVsYXRpb24gdG8gbGVhcm4gYWJvdXQgdGhlIGRpc3RyaWJ1dGlvbiBvZiB0aGUgbnVtYmVyIG9mIHAtdmFsdWVzIHRoYXQgYXJlIGxlc3MgdGhhbiAwLjA1LiBJbiBxdWVzdGlvbiAxLjIuMyB3ZSByYW4gdGhlIDIwIGRpZXQgZXhwZXJpbWVudCBvbmNlLiBOb3cgd2Ugd2lsbCBydW4gdGhlc2UgMjAgZXhwZXJpbWVudHMgMSwwMDAgdGltZXMgYW5kIGVhY2ggdGltZSBzYXZlIHRoZSBudW1iZXIgb2YgcC12YWx1ZXMgdGhhdCBhcmUgbGVzcyB0aGFuIDAuMDUuCgpTZXQgdGhlIHNlZWQgYXQgMTAwIGFnYWluLCBzZXQuc2VlZCgxMDApLCBydW4gdGhlIGNvZGUgZnJvbSBRdWVzdGlvbiAxLjIuMyAxLDAwMCB0aW1lcywgYW5kIHNhdmUgdGhlIG51bWJlciBvZiB0aW1lcyB0aGUgcC12YWx1ZSBpcyBsZXNzIHRoYW4gMC4wNSBmb3IgZWFjaCBvZiB0aGUgMSwwMDAgaW5zdGFuY2VzLgoKV2hhdCBpcyB0aGUgYXZlcmFnZSBvZiB0aGVzZSAxLDAwMCBudW1iZXJzPyBOb3RlIHRoYXQgdGhpcyBpcyB0aGUgZXhwZWN0ZWQgbnVtYmVyIG9mIHRlc3RzIChvdXQgb2YgdGhlIDIwIHdlIHJ1bikgdGhhdCB3ZSB3aWxsIHJlamVjdCB3aGVuIHRoZSBudWxsIGlzIHRydWUuIChIaW50OiB1c2UgcmVwbGljYXRlIHR3aWNlKQoKCmBgYHtyfQpzZXQuc2VlZCgxMDApCgpsZW5WZWMgPSBjKCkKbW91c2VQdmFsID0gZnVuY3Rpb24oKXsKICBjYXNlcyA9IHJub3JtKDEwLDMwLDIpCiAgY29udHJvbHMgPSBybm9ybSgxMCwzMCwyKQogIHJldHVybih0LnRlc3QoY2FzZXMsY29udHJvbHMpJHAudmFsdWUpCn0KCmZvciAoaiBpbiAxOjEwMDApewogIHB2YWxzID0gYygpCiAgZm9yIChpIGluIDE6MjApewogICAgcHZhbHNbaV0gPSBtb3VzZVB2YWwoKQogIH0KCiAgbGVuVmVjW2pdID0gbGVuZ3RoKHB2YWxzW3B2YWxzIDwgMC4wNV0pCgp9CgptZWFuKGxlblZlYykKCiMgQ2FuIGFsc28gdXNlIHRoZSByZXBsaWNhdGUgZnVuY3Rpb24gOiByZXBsaWNhdGUobiAsIEZVTikKCmBgYAoKIyMgSW5mZXJlbmNlIGluIFByYWN0aWNlIEV4ZXJjaXNlcyAjNQoKCk5vdGUgdGhhdCB3aGF0IHRoZSBhbnN3ZXIgdG8gcXVlc3Rpb24gIzQgc2F5cyBpcyB0aGF0IG9uIGF2ZXJhZ2UsIHdlIGV4cGVjdCBzb21lIHAtdmFsdWUgdG8gYmUgMC4wNSBldmVuIHdoZW4gdGhlIG51bGwgaXMgdHJ1ZSBmb3IgYWxsIGRpZXRzLgoKVXNpbmcgdGhlIHNhbWUgc2ltdWxhdGlvbiBkYXRhIGZyb20gdGhlIHF1ZXN0aW9uIGFib3ZlLCBmb3Igd2hhdCBwcm9wb3J0aW9uIG9mIHRoZSAxLDAwMCByZXBsaWNhdGlvbnMgZG8gd2UgcmVqZWN0IHRoZSBudWxsIGh5cG90aGVzaXMgYXQgbGVhc3Qgb25jZSAobW9yZSB0aGFuIDAgZmFsc2UgcG9zaXRpdmVzKT8gKEVudGVyIHlvdXIgcmVzcG9uc2UgYXMgYSBkZWNpbWFsIHZhbHVlIC0tIGkuZS4gMC4xMCBmb3IgMTAlLikKCmBgYHtyfQpsZW5ndGgod2hpY2gobGVuVmVjID49IDEgKSkvbGVuZ3RoKGxlblZlYykKYGBgCgoKIyBXRUVLIDIKCldoaWNoIHByb2NlZHVyZSBpcyBtb3JlIGNvbnNlcnZhdGl2ZSAocGlja3MgbGVzcyBnZW5lcywgaS5lLiByZWplY3RzIGxlc3MgbnVsbCBoeXBvdGhlc2lzKTogQm9uZmVycm9uaSdzIG9yIFNpZGFrJ3M/Ck1ha2UgYSBwbG90IG9mICRcYWxwaGEvbSQgYW5kICQxLSgxLVxhbHBoYSleezEvbX0kIGFuZCBmb3IgdmFyaW91cyB2YWx1ZXMgb2YgbT4xLiAKCmBgYHtyfQphbHBoYSA8LSBzZXEoMCwwLjI1LDAuMDEpCm0gPSAxOjEwMDAwCmJvbmZlcnJvbmkgPSBhbHBoYS9tCnNpZGFrID0gMS0oMSAtIGFscGhhKSoqKDEvbSkKcGxvdChtLCBzaWRhaywgY29sID0gInJlZCIsIHlsYWIgPSAiayIsIHBjaCA9IDIwKQpwb2ludHMobSwgYm9uZmVycm9uaSwgY29sID0gImdyZWVuIiwgcGNoID0gMjEpCmBgYAoKIyMjIEJvbmZlcnJvbmkgQ29ycmVjdGlvbiBFeGVyY2lzZXMgIzIgKE1vbnRlIENhcmxvIFNpbXVsYXRpb24pIAoKTW9udGUgQ2FybG8gc2ltdWxhdGlvbi4gVG8gc2ltdWxhdGUgdGhlIHAtdmFsdWUgcmVzdWx0cyBvZiwgc2F5LCA4LDc5MyB0LXRlc3RzIGZvciB3aGljaCB0aGUgbnVsbCBpcyB0cnVlIHdlIGRvbid0IGFjdHVhbCBoYXZlIHRvIGdlbmVyYXRlIHRoZSBvcmlnaW5hbCBkYXRhLiBBcyB3ZSBsZWFybmVkIGluIGNsYXNzIHdlIGNhbiBnZW5lcmF0ZSBwLXZhbHVlcyBmcm9tIGEgdW5pZm9ybSBkaXN0cmlidXRpb24gbGlrZSB0aGlzOgoKYHB2YWxzIDwtIHJ1bmlmKDg3OTMsMCwxKWAKClVzaW5nIHdoYXQgd2UgaGF2ZSBsZWFybmVkLCBzZXQgdGhlIGN1dG9mZiB1c2luZyB0aGUgQm9uZmVycm9uaSBjb3JyZWN0aW9uIHRoYXQgZ3VhcmFudGVlcyBhbiBGV0VSIGxvd2VyIHRoYW4gMC4wNSBhbmQgcmVwb3J0IGJhY2sgdGhlIEZXRVIuIFNldCB0aGUgc2VlZCBhdCAxLCBgc2V0LnNlZWQoMSlgIGFuZCBydW4gMTAsMDAwIHNpbXVsYXRpb24uIFJlcG9ydCB0aGUgTW9udGUgQ2FybG8gZXN0aW1hdGUgb2YgdGhlIEZXRVIgYmVsb3cuCgpgYGB7cn0Kc2V0LnNlZWQoMSkKYWxwaGEgPSAwLjA1Cm0gPSA4NzkzCmsgPSBhbHBoYS9tCmVzdGltYXRlID0gYygpCmZvciAoaSBpbiAxOjEwMDAwKXsKICBwdmFscyA8LSBydW5pZihtLDAsMSkKICBlc3RpbWF0ZVtpXSA9IHN1bShwdmFsczxrKQp9CgptZWFuKGVzdGltYXRlKQoKCmBgYAoKVXNpbmcgdGhlIHNhbWUgc2VlZCByZXBlYXQgdGhlIGFib3ZlIGZvciBTaWRhaydzIGN1dG9mZi4gCgoKYGBge3J9CnNldC5zZWVkKDEpCmFscGhhID0gMC4wNQptID0gODc5MwprID0gMS0oMSAtIGFscGhhKSoqKDEvbSkKZXN0aW1hdGUgPSBjKCkKZm9yIChpIGluIDE6MTAwMDApewogIHB2YWxzIDwtIHJ1bmlmKG0sMCwxKQogIGVzdGltYXRlW2ldID0gc3VtKHB2YWxzPGspCn0KCm1lYW4oZXN0aW1hdGUpCgpgYGAKCgojIyBGRFIgRXhlcmNpc2VzCgpJbiB0aGlzIGFzc2Vzc21lbnQgd2Ugd2lsbCBkZWZpbmUgZXJyb3IgY29udHJvbGxpbmcgcHJvY2VkdXJlcyBmb3IgZXhwZXJpbWVudGFsIGRhdGEuIFdlIHdpbGwgbWFrZSBsaXN0IG9mIGdlbmVzIGJhc2VkIG9uIHEtdmFsdWVzLiBXZSB3aWxsIGFsc28gYXNzZXNzIHlvdXIgdW5kZXJzdGFuZGluZyBvZiBmYWxzZSBwb3NpdGl2ZXMgcmF0ZXMgYW5kIGZhbHNlIG5lZ2F0aXZlIHJhdGVzIGJ5IGFza2luZyB5b3UgdG8gY3JlYXRlIGEgTW9udGUgQ2FybG8gc2ltdWxhdGlvbi4KCmBgYHtyfQpsaWJyYXJ5KHF2YWx1ZSkKbGlicmFyeShkZXZ0b29scykKbGlicmFyeShyYWZhbGliKQppbnN0YWxsX2dpdGh1YigiZ2Vub21pY3NjbGFzcy9HU0U1ODU5U3Vic2V0IikKaW5zdGFsbF9iaW9jKCJnZW5lZmlsdGVyIikKaW5zdGFsbF9iaW9jKCJxdmFsdWUiKQpgYGAKCgojIyMgRkRSIEV4ZXJjaXNlcyAjMQoKTG9hZCB0aGUgZ2VuZSBleHByZXNzaW9uIGRhdGEKCmBgYHtyfQpsaWJyYXJ5KEdTRTU4NTlTdWJzZXQpCmRhdGEoR1NFNTg1OVN1YnNldCkKYGBgCgpXZSBhcmUgaW50ZXJlc3RlZCBpbiBjb21wYXJpbmcgZ2VuZSBleHByZXNzaW9uIGJldHdlZW4gdGhlIHR3byBncm91cHMgZGVmaW5lZCBpbiB0aGUgc2FtcGxlSW5mbyB0YWJsZS4KCkNvbXB1dGUgYSBwLXZhbHVlIGZvciBlYWNoIGdlbmUgdXNpbmcgdGhlIGZ1bmN0aW9uIHJvd3R0ZXN0cyBmcm9tIHRoZSBnZW5lZmlsdGVyIHBhY2thZ2UgaW4gQmlvY29uZHVjdG9yLgoKYGBge3J9CmxpYnJhcnkoZ2VuZWZpbHRlcikKP3Jvd3R0ZXN0cwpzdW0ocm93dHRlc3RzKGdlbmVFeHByZXNzaW9uLCBhcy5mYWN0b3Ioc2FtcGxlSW5mbyRncm91cCkpJHAudmFsdWUgPCAwLjA1KQpgYGAKIyMjIEZEUiBFeGVyY2lzZXMgIzIKCkFwcGx5IHRoZSBCb25mZXJyb25pIGNvcnJlY3Rpb24gdG8gdGhlIHAtdmFsdWVzIG9idGFpbmVkIGluIHF1ZXN0aW9uICMxIHRvIGFjaGlldmUgYSBGV0VSIG9mIDAuMDUuIEhvdyBtYW55IGdlbmVzIGFyZSBjYWxsZWQgc2lnbmlmaWNhbnQgdW5kZXIgdGhpcyBwcm9jZWR1cmU/CgpgYGB7cn0Kc3VtKHJvd3R0ZXN0cyhnZW5lRXhwcmVzc2lvbiwgYXMuZmFjdG9yKHNhbXBsZUluZm8kZ3JvdXApKSRwLnZhbHVlIDwgKDAuMDUvbnJvdyhnZW5lRXhwcmVzc2lvbikpKSAKCmBgYAojIyMgRkRSIEV4ZXJjaXNlcyAjMwoKTm90ZSB0aGF0IHRoZSBGRFIgaXMgYSBwcm9wZXJ0eSBvZiBhIGxpc3Qgb2YgZmVhdHVyZXMsIG5vdCBlYWNoIHNwZWNpZmljIGZlYXR1cmUuIFRoZSBxLXZhbHVlIHJlbGF0ZXMgRkRSIHRvIGFuIGluZGl2aWR1YWwgZmVhdHVyZS4gVG8gZGVmaW5lIHRoZSBxLXZhbHVlIHdlIG9yZGVyIGZlYXR1cmVzIHdlIHRlc3RlZCBieSBwLXZhbHVlIHRoZW4gY29tcHV0ZSB0aGUgRkRScyBmb3IgYSBsaXN0IHdpdGggdGhlIG1vc3Qgc2lnbmlmaWNhbnQsIHRoZSB0d28gbW9zdCBzaWduaWZpY2FudCwgdGhlIHRocmVlIG1vc3Qgc2lnbmlmaWNhbnQsIGV0Yy4uLiBUaGUgRkRSIG9mIHRoZSBsaXN0IHdpdGggdGhlLCBzYXksIG0gbW9zdCBzaWduaWZpY2FudCB0ZXN0cyBpcyBkZWZpbmVkIGFzIHRoZSBxLXZhbHVlIG9mIHRoZSBtLXRoIG1vc3Qgc2lnbmlmaWNhbnQgZmVhdHVyZS4gSW4gb3RoZXIgd29yZHMsIHRoZSBxLXZhbHVlIG9mIGEgZmVhdHVyZSwgaXMgdGhlIEZEUiBvZiB0aGUgYmlnZ2VzdCBsaXN0IHRoYXQgaW5jbHVkZXMgdGhhdCBnZW5lLgoKSW4gUiwgd2UgY2FuIGNvbXB1dGUgdGhlIHEtdmFsdWUgdXNpbmcgdGhlIGBwLmFkanVzdGAgZnVuY3Rpb24gd2l0aCB0aGUgRkRSIG9wdGlvbi4gUmVhZCB0aGUgaGVscCBmaWxlIGZvciBgcC5hZGp1c3RgIGFuZCB0aGVuLCBmb3Igb3VyIGdlbmUgZXhwcmVzc2lvbiBkYXRhc2V0LCBjb21wdXRlIGhvdyBtYW55IGdlbmVzIGFjaGlldmUgYW4gRkRSIDwgMC4wNQoKYGBge3J9CnB2YWxzID0gcm93dHRlc3RzKGdlbmVFeHByZXNzaW9uLCBhcy5mYWN0b3Ioc2FtcGxlSW5mbyRncm91cCkpJHAudmFsdWUKc3VtKHAuYWRqdXN0KHB2YWxzLCBtZXRob2QgPSAiZmRyIiwgbiA9IGxlbmd0aChwdmFscykpPDAuMDUpCgpgYGAKCgojIyMgRkRSIEV4ZXJjaXNlcyAjNAoKTm93IHVzZSB0aGUgcXZhbHVlIGZ1bmN0aW9uLCBpbiB0aGUgQmlvY29uZHVjdG9yIHF2YWx1ZSBwYWNrYWdlLCB0byBlc3RpbWF0ZSBxLXZhbHVlcyB1c2luZyB0aGUgcHJvY2VkdXJlIGRlc2NyaWJlZCBieSBTdG9yZXkuCgpVc2luZyB0aGlzIGVzdGltYXRlIGhvdyBtYW55IGdlbmVzIGhhdmUgcS12YWx1ZXMgYmVsb3cgMC4wNT8KCgpgYGB7cn0Kc3VtKHF2YWx1ZShwdmFscykkcXZhbHVlczwwLjA1KQpgYGAKCgojIyMgRkRSIEV4ZXJjaXNlcyAjNQoKUmVhZCB0aGUgaGVscCBmaWxlIGZvciBxdmFsdWUgYW5kIHJlcG9ydCB0aGUgZXN0aW1hdGVkIHByb3BvcnRpb24gb2YgZ2VuZXMgZm9yIHdoaWNoIHRoZSBudWxsIGh5cG90aGVzaXMgaXMgdHJ1ZSAkXHBpX3swfSA9IG1fezB9L20kCgpgYGB7cn0KcXZhbHVlKHB2YWxzKSRwaTAKYGBgCgojIyMgRkRSIEV4ZXJjaXNlcyAjNwoKTm90ZSB0aGF0IHRoaXMgaXMgYW4gYWR2YW5jZWQgcXVlc3Rpb24gYW5kIHRoYXQgeW91IGNhbiBhc2sgcXVlc3Rpb25zIGluIHRoZSBkaXNjdXNzaW9uIGZvcnVtLgoKQ3JlYXRlIGEgTW9udGUgQ2FybG8gU2ltdWxhdGlvbiBpbiB3aGljaCB5b3Ugc2ltdWxhdGUgbWVhc3VyZW1lbnRzIGZyb20gOCw3OTMgZ2VuZXMgZm9yIDI0IHNhbXBsZXM6IDEyIGNhc2VzIGFuZCAxMiBjb250cm9scy4gCgpgYGB7cn0KbiA8LSAyNAptIDwtIDg3OTMKbWF0IDwtIG1hdHJpeChybm9ybShuKm0pLG0sbikKYGBgCgpOb3cgZm9yIDUwMCBnZW5lcywgdGhlcmUgaXMgYSBkaWZmZXJlbmNlIG9mIDIgYmV0d2VlbiBjYXNlcyBhbmQgY29udHJvbHM6CgpgYGB7cn0KZGVsdGEgPC0gMgpwb3NpdGl2ZXMgPC0gNTAwCm1hdFsxOnBvc2l0aXZlcywxOihuLzIpXSA8LSBtYXRbMTpwb3NpdGl2ZXMsMToobi8yKV0rZGVsdGEKYGBgCgpTbyB0aGUgbnVsbCBoeXBvdGhlc2lzIGlzIHRydWUgZm9yIDg3OTMtNTAwIGdlbmVzLiBVc2luZyB0aGUgbm90YXRpb24gZnJvbSB0aGUgdmlkZW9zIG09ODc5MywgbTA9ODI5MyBhbmQgbTE9NTAwCgpTZXQgdGhlIHNlZWQgYXQgMSwgc2V0LnNlZWQoMSkgYW5kIHJ1biB0aGlzIGV4cGVyaW1lbnQgMSwwMDAgdGltZXMgd2l0aCBhIE1vbnRlIENhcmxvIHNpbXVsYXRpb24uIEZvciBlYWNoIGluc3RhbmNlIGNvbXB1dGUgcC12YWx1ZXMgdXNpbmcgYSB0LXRlc3QgKHVzaW5nIHJvd3R0ZXN0cyBpbiB0aGUgZ2VuZWZpbHRlciBwYWNrYWdlKSBhbmQgY3JlYXRlIHRocmVlIGxpc3RzIG9mIGdlbmVzIHVzaW5nOgoKLSBCb25mZXJyb25pIGNvcnJlY3Rpb24gdG8gYWNoaWV2ZSBhbiBGV0VSIG9mIDAuMDUsCgpgYGB7cn0Kc2V0LnNlZWQoMSkKbGlicmFyeShxdmFsdWUpCmxpYnJhcnkoZ2VuZWZpbHRlcikKbiA8LSAyNAptIDwtIDg3OTMKbTA9ODI5MwptMT01MDAKQiA8LSAxMDAwCmRlbHRhIDwtMgpwb3NpdGl2ZXMgPC0gNTAwCmcgPC0gZmFjdG9yKHJlcChjKDAsMSksZWFjaD0xMikpCnJlc3VsdCA8LSByZXBsaWNhdGUoQix7CiAgbWF0IDwtIG1hdHJpeChybm9ybShuKm0pLG0sbikKICBtYXRbMTpwb3NpdGl2ZXMsMToobi8yKV0gPC0gbWF0WzE6cG9zaXRpdmVzLDE6KG4vMildK2RlbHRhCiAgcHZhbHMgPSByb3d0dGVzdHMobWF0LGcpJHAudmFsCiAgIyNCb25mZXJyb25pCiAgRlAxIDwtIHN1bShwdmFsc1stKDE6cG9zaXRpdmVzKV08PTAuMDUvbSkgIAogIH0pCm1lYW4ocmVzdWx0L20wKQpgYGAKCi0gcC1hZGp1c3QgZXN0aW1hdGVzIG9mIEZEUiB0byBhY2hpZXZlIGFuIEZEUiBvZiAwLjA1LCBhbmQKLSBxdmFsdWUgZXN0aW1hdGVzIG9mIEZEUiB0byB0byBhY2hpZXZlIGFuIEZEUiBvZiAwLjA1LgoKRm9yIGVhY2ggb2YgdGhlc2UgdGhyZWUgbGlzdHMgY29tcHV0ZSB0aGUgbnVtYmVyIG9mIGZhbHNlIHBvc2l0aXZlcyBpbiB0aGUgbGlzdCBhbmQgdGhlIG51bWJlciBvZiBmYWxzZSBuZWdhdGl2ZXM6IGdlbmVzIG5vdCBpbiB0aGUgbGlzdCB0aGF0IHNob3VsZCBoYXZlIGJlZW4gYmVjYXVzZSB0aGUgbnVsbCBoeXBvdGhlc2lzIGlzIG5vdCB0cnVlICh3ZSBhZGRlZCAyIHRvIHRoZSBjb250cm9scyB0byBjcmVhdGUgdGhlIGNhc2VzKS4KCldoYXQgaXMgdGhlIGZhbHNlIHBvc2l0aXZlIHJhdGUgKGZhbHNlIHBvc2l0aXZlcyBkaXZpZGVkIGJ5IG0wKSBpZiB3ZSB1c2UgQm9uZmVycm9uaT8KCiMjIyBGRFIgRXhlcmNpc2VzICM4CgpGcm9tIHRoZSBzYW1lIE1vbnRlIENhcmxvIHNpbXVsYXRpb24gYXMgaW4gdGhlIHF1ZXN0aW9uIGFib3ZlLCB3aGF0IGlzIHRoZSBmYWxzZSBuZWdhdGl2ZSByYXRlIGlmIHdlIHVzZSBCb25mZXJyb25pPwoKYGBge3J9CnNldC5zZWVkKDEpCmxpYnJhcnkocXZhbHVlKQpsaWJyYXJ5KGdlbmVmaWx0ZXIpCm4gPC0gMjQKbSA8LSA4NzkzCkIgPC0gMTAwMAptMD04MjkzCm0xPTUwMApkZWx0YSA8LTIKcG9zaXRpdmVzIDwtIDUwMApnIDwtIGZhY3RvcihyZXAoYygwLDEpLGVhY2g9MTIpKQpyZXN1bHQgPC0gcmVwbGljYXRlKEIsewogIG1hdCA8LSBtYXRyaXgocm5vcm0obiptKSxtLG4pCiAgbWF0WzE6cG9zaXRpdmVzLDE6KG4vMildIDwtIG1hdFsxOnBvc2l0aXZlcywxOihuLzIpXStkZWx0YQogIHB2YWxzID0gcm93dHRlc3RzKG1hdCxnKSRwLnZhbAogICMjQm9uZmVycm9uaQogIEZQMSA8LSBzdW0ocHZhbHNbLSgxOnBvc2l0aXZlcyldPD0wLjA1L20pICAKICBGTjEgPC0gc3VtKHB2YWxzWzE6cG9zaXRpdmVzXT4wLjA1L20pCiAgYyhGUDEsRk4xKQp9KQptZWFuKHJlc3VsdFsyLF0vbTEpCmBgYAoKIyMjIEZEUiBFeGVyY2lzZXMgIzkKCkZyb20gdGhlIHNhbWUgTW9udGUgQ2FybG8gc2ltdWxhdGlvbiBhcyBpbiBxdWVzdGlvbiAjNywgd2hhdCBpcyB0aGUgZmFsc2UgcG9zaXRpdmUgcmF0ZSBpZiB3ZSB1c2UgcS12YWx1ZXMgZnJvbSBwLmFkanVzdD8KYGBge3J9CnNldC5zZWVkKDEpCmxpYnJhcnkocXZhbHVlKQpsaWJyYXJ5KGdlbmVmaWx0ZXIpCm4gPC0gMjQKbSA8LSA4NzkzCm0wPTgyOTMKbTE9NTAwCkIgPC0gMTAwMApkZWx0YSA8LTIKcG9zaXRpdmVzIDwtIDUwMApnIDwtIGZhY3RvcihyZXAoYygwLDEpLGVhY2g9MTIpKQpyZXN1bHQgPC0gcmVwbGljYXRlKEIsewogIG1hdCA8LSBtYXRyaXgocm5vcm0obiptKSxtLG4pCiAgbWF0WzE6cG9zaXRpdmVzLDE6KG4vMildIDwtIG1hdFsxOnBvc2l0aXZlcywxOihuLzIpXStkZWx0YQogIHB2YWxzID0gcm93dHRlc3RzKG1hdCxnKSRwLnZhbAogIHBhZGogPSBwLmFkanVzdChwdmFscywgbWV0aG9kID0gImZkciIsIG4gPSBtKQogIEZQMSA8LSBzdW0ocGFkalstKDE6cG9zaXRpdmVzKV08PTAuMDUpCiAgfSkKCm1lYW4ocmVzdWx0L20wKQpgYGAKCiBGRFIgRXhlcmNpc2VzICMxMAoKRnJvbSB0aGUgc2FtZSBNb250ZSBDYXJsbyBzaW11bGF0aW9uIGFzIGluIHF1ZXN0aW9uICM3LCB3aGF0IGlzIHRoZSBmYWxzZSBuZWdhdGl2ZSByYXRlIGlmIHdlIHVzZSBxLXZhbHVlcyBmcm9tIHAuYWRqdXN0PwoKYGBge3J9CnNldC5zZWVkKDEpCmxpYnJhcnkocXZhbHVlKQpsaWJyYXJ5KGdlbmVmaWx0ZXIpCm4gPC0gMjQKbSA8LSA4NzkzCm0wPTgyOTMKbTE9NTAwCkIgPC0gMTAwMApkZWx0YSA8LTIKcG9zaXRpdmVzIDwtIDUwMApnIDwtIGZhY3RvcihyZXAoYygwLDEpLGVhY2g9MTIpKQpyZXN1bHQgPC0gcmVwbGljYXRlKEIsewogIG1hdCA8LSBtYXRyaXgocm5vcm0obiptKSxtLG4pCiAgbWF0WzE6cG9zaXRpdmVzLDE6KG4vMildIDwtIG1hdFsxOnBvc2l0aXZlcywxOihuLzIpXStkZWx0YQogIHB2YWxzID0gcm93dHRlc3RzKG1hdCxnKSRwLnZhbAogIHBhZGogPSBwLmFkanVzdChwdmFscywgbWV0aG9kID0gImZkciIsIG4gPSBtKQogIEZQMSA8LSBzdW0ocGFkalstKDE6cG9zaXRpdmVzKV08PTAuMDUpCiAgRk4xIDwtIHN1bShwYWRqWzE6cG9zaXRpdmVzXT4wLjA1KQogIGMoRlAxLEZOMSkKICB9KQoKbWVhbihyZXN1bHRbMixdL20xKQpgYGAKCgojIyMgRkRSIEV4ZXJjaXNlcyAjMTEKCkZyb20gdGhlIHNhbWUgTW9udGUgQ2FybG8gc2ltdWxhdGlvbiBhcyBpbiBxdWVzdGlvbiAjNywgd2hhdCBpcyB0aGUgZmFsc2UgcG9zaXRpdmUgcmF0ZSBpZiB3ZSB1c2UgcS12YWx1ZXMgZnJvbSBxdmFsdWUgZnVuY3Rpb24/CgpgYGB7cn0Kc2V0LnNlZWQoMSkKbGlicmFyeShxdmFsdWUpCmxpYnJhcnkoZ2VuZWZpbHRlcikKbiA8LSAyNAptIDwtIDg3OTMKbTA9ODI5MwptMT01MDAKQiA8LSAxMDAwCmRlbHRhIDwtMgpwb3NpdGl2ZXMgPC0gNTAwCmcgPC0gZmFjdG9yKHJlcChjKDAsMSksZWFjaD0xMikpCnJlc3VsdCA8LSByZXBsaWNhdGUoQix7CiAgbWF0IDwtIG1hdHJpeChybm9ybShuKm0pLG0sbikKICBtYXRbMTpwb3NpdGl2ZXMsMToobi8yKV0gPC0gbWF0WzE6cG9zaXRpdmVzLDE6KG4vMildK2RlbHRhCiAgcHZhbHMgPSByb3d0dGVzdHMobWF0LGcpJHAudmFsCiAgcGFkaiA9IHF2YWx1ZShwdmFscykkcXZhbHVlcwogIEZQMSA8LSBzdW0ocGFkalstKDE6cG9zaXRpdmVzKV08PTAuMDUpCiAgRk4xIDwtIHN1bShwYWRqWzE6cG9zaXRpdmVzXT4wLjA1KQogIGMoRlAxLEZOMSkKICB9KQoKbWVhbihyZXN1bHRbMSxdL20wKQpgYGAKCgojIyMgRkRSIEV4ZXJjaXNlcyAjMTIKCgpGcm9tIHRoZSBzYW1lIE1vbnRlIENhcmxvIHNpbXVsYXRpb24gYXMgaW4gcXVlc3Rpb24gIzcsIHdoYXQgaXMgdGhlIGZhbHNlIG5lZ2F0aXZlIHJhdGUgaWYgd2UgdXNlIHEtdmFsdWVzIGZyb20gcXZhbHVlIGZ1bmN0aW9uPwoKYGBge3J9CnNldC5zZWVkKDEpCmxpYnJhcnkocXZhbHVlKQpsaWJyYXJ5KGdlbmVmaWx0ZXIpCm4gPC0gMjQKbSA8LSA4NzkzCm0wPTgyOTMKbTE9NTAwCkIgPC0gMTAwMApkZWx0YSA8LTIKcG9zaXRpdmVzIDwtIDUwMApnIDwtIGZhY3RvcihyZXAoYygwLDEpLGVhY2g9MTIpKQpyZXN1bHQgPC0gcmVwbGljYXRlKEIsewogIG1hdCA8LSBtYXRyaXgocm5vcm0obiptKSxtLG4pCiAgbWF0WzE6cG9zaXRpdmVzLDE6KG4vMildIDwtIG1hdFsxOnBvc2l0aXZlcywxOihuLzIpXStkZWx0YQogIHB2YWxzID0gcm93dHRlc3RzKG1hdCxnKSRwLnZhbAogIHBhZGogPSBxdmFsdWUocHZhbHMpJHF2YWx1ZXMKICBGUDEgPC0gc3VtKHBhZGpbLSgxOnBvc2l0aXZlcyldPD0wLjA1KQogIEZOMSA8LSBzdW0ocGFkalsxOnBvc2l0aXZlc10+MC4wNSkKICBjKEZQMSxGTjEpCiAgfSkKCm1lYW4ocmVzdWx0WzIsXS9tMSkKYGBg</div>
 
 
 
