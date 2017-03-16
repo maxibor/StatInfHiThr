@@ -1,5 +1,5 @@
 ----
-## Exercices and corrections for the [PH525.3x Statistical Inference and Modeling for High-throughput Experiments](https://courses.edx.org/courses/course-v1:HarvardX+PH525.3x+2T2016) edX MOOC.
+## Exercices and corrections for the [PH525.3x Statistical Inference and Modeling for High-throughput Experiments](https://www.edx.org/course/statistical-inference-modeling-high-harvardx-ph525-3x) edX MOOC.
 
 ----
 
