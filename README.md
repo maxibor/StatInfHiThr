@@ -1,9 +1,11 @@
----
-title: "R Exercices PH525.3x"
-output:
-  html_document: default
-  html_notebook: default
----
+----
+## Exercices and corrections for the [PH525.3x Statistical Inference and Modeling for High-throughput Experiments](https://courses.edx.org/courses/course-v1:HarvardX+PH525.3x+2T2016) edX MOOC.
+
+----
+
+
+
+
 # WEEK 1
 
 ## R Refresher Exercises
@@ -18,13 +20,13 @@ library(devtools)
 ```
 
 ```
-## 
+##
 ## Attaching package: 'devtools'
 ```
 
 ```
 ## The following object is masked from 'package:rafalib':
-## 
+##
 ##     install_bioc
 ```
 
@@ -108,7 +110,7 @@ Write a function that takes a vector of values e and a binary vector group codin
 
 Now define g to code cases (1) and controls (0) like this g <- factor(sampleInfo$group)
 
-Next use the function apply to run a t-test for each row of geneExpression and obtain the p-value. What is smallest p-value among all these t-tests? 
+Next use the function apply to run a t-test for each row of geneExpression and obtain the p-value. What is smallest p-value among all these t-tests?
 
 
 ```r
@@ -137,7 +139,7 @@ sort(apply(geneExpression,1,tpval, g))[1]
 ```
 
 ```
-##    201909_at 
+##    201909_at
 ## 1.406803e-21
 ```
 
@@ -155,13 +157,13 @@ library(downloader)
 ```
 
 ```
-## 
+##
 ## Attaching package: 'downloader'
 ```
 
 ```
 ## The following object is masked from 'package:devtools':
-## 
+##
 ##     source_url
 ```
 
@@ -210,7 +212,7 @@ length(pvals[pvals < 0.01])/length(pvals)
 ```
 
 
-### Inference in Practice Exercises #3 
+### Inference in Practice Exercises #3
 
 Assume you are testing the effectiveness of 20 diets on mice weight. For each of the 20 diets you run an experiment with 10 control mice and 10 treated mice. Assume the null hypothesis that the diet has no effect is true for all 20 diets and that mice weights follow a normal distribution with mean 30 grams and a standard deviation of 2 grams, run a Monte Carlo simulation for one of these studies:
 
@@ -222,16 +224,16 @@ t.test(cases,controls)
 ```
 
 ```
-## 
+##
 ## 	Welch Two Sample t-test
-## 
+##
 ## data:  cases and controls
 ## t = 0.16473, df = 17.934, p-value = 0.871
 ## alternative hypothesis: true difference in means is not equal to 0
 ## 95 percent confidence interval:
 ##  -1.708669  1.999327
 ## sample estimates:
-## mean of x mean of y 
+## mean of x mean of y
 ##  30.23172  30.08639
 ```
 
@@ -322,7 +324,7 @@ length(which(lenVec >= 1 ))/length(lenVec)
 # WEEK 2
 
 Which procedure is more conservative (picks less genes, i.e. rejects less null hypothesis): Bonferroni's or Sidak's?
-Make a plot of $\alpha/m$ and $1-(1-\alpha)^{1/m}$ and for various values of m>1. 
+Make a plot of $\alpha/m$ and $1-(1-\alpha)^{1/m}$ and for various values of m>1.
 
 
 ```r
@@ -352,7 +354,7 @@ points(m, bonferroni, col = "green", pch = 21)
 
 ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-1.png)
 
-### Bonferroni Correction Exercises #2 (Monte Carlo Simulation) 
+### Bonferroni Correction Exercises #2 (Monte Carlo Simulation)
 
 Monte Carlo simulation. To simulate the p-value results of, say, 8,793 t-tests for which the null is true we don't actual have to generate the original data. As we learned in class we can generate p-values from a uniform distribution like this:
 
@@ -379,7 +381,7 @@ mean(estimate)
 ## [1] 0.0478
 ```
 
-Using the same seed repeat the above for Sidak's cutoff. 
+Using the same seed repeat the above for Sidak's cutoff.
 
 
 
@@ -443,7 +445,7 @@ install_bioc("genefilter")
 ```
 
 ```
-## 
+##
 ```
 
 ```
@@ -474,7 +476,7 @@ install_bioc("qvalue")
 ```
 
 ```
-## 
+##
 ```
 
 ```
@@ -512,7 +514,7 @@ Apply the Bonferroni correction to the p-values obtained in question #1 to achie
 
 
 ```r
-sum(rowttests(geneExpression, as.factor(sampleInfo$group))$p.value < (0.05/nrow(geneExpression))) 
+sum(rowttests(geneExpression, as.factor(sampleInfo$group))$p.value < (0.05/nrow(geneExpression)))
 ```
 
 ```
@@ -571,7 +573,7 @@ qvalue(pvals)$pi0
 
 Note that this is an advanced question and that you can ask questions in the discussion forum.
 
-Create a Monte Carlo Simulation in which you simulate measurements from 8,793 genes for 24 samples: 12 cases and 12 controls. 
+Create a Monte Carlo Simulation in which you simulate measurements from 8,793 genes for 24 samples: 12 cases and 12 controls.
 
 
 ```r
@@ -803,7 +805,7 @@ mean(result[2,]/m1)
 # WEEK 3
 
 ## Statistical Models Exercises
-###  Statistical Models Exercises #1 
+###  Statistical Models Exercises #1
 
 Suppose you have an urn with blue and red balls. If balls at selected at random with replacement (you put the ball back after you pick it) we can denote the outcomes as random variables that are 1 or 0. If the proportion of red balls is
 
@@ -1092,7 +1094,7 @@ hist(counts)
 ![plot of chunk unnamed-chunk-46](figure/unnamed-chunk-46-1.png)
 
 
-Let $X_{1},...,X_{n}$ be the random variables representing counts then 
+Let $X_{1},...,X_{n}$ be the random variables representing counts then
 
 $Pr(X_{i} = k) =\frac{\lambda^{k}}{k!} \exp(-\lambda) $
 
@@ -1132,7 +1134,7 @@ loglikelihood
 ```
 
 
-Now write a function that takes $\lambda$ and the vector of counts as input, and returns the log-likelihood. Compute this log-likelihood for lambdas = seq(0,15,len=300) and make a plot. 
+Now write a function that takes $\lambda$ and the vector of counts as input, and returns the log-likelihood. Compute this log-likelihood for lambdas = seq(0,15,len=300) and make a plot.
 
 What value of lambdas maximizes the log-likelihood?
 
@@ -1206,7 +1208,7 @@ max(counts)
 Now that we have identified the location with the largest palindrome count, we want to know if by chance we could see a value this big.
 
 If $X$ is a Poisson random variable with rate
- 
+
 
 ```r
 lambda = mean(counts[ - which.max(counts) ])
@@ -1268,7 +1270,7 @@ library(tissuesGeneExpression)
 ```
 
 
-Now load this data and select the columns related to endometrium: 
+Now load this data and select the columns related to endometrium:
 
 
 ```r
@@ -1322,7 +1324,7 @@ Which of the following best describes the qq-plot?
 ```r
 ps <- (seq(along=s2)-0.5)/length(s2)
 
-theoretical<- qf(ps,14,estimates$df2)*estimates$scale 
+theoretical<- qf(ps,14,estimates$df2)*estimates$scale
 
 LIM <- sqrt( range(c(theoretical,s2)) )
 
@@ -1464,7 +1466,7 @@ What proportion of genes with a p-value < 0.01 (no multiple comparison correctio
 ```r
 library(genefilter)
 rtt = rowttests(y,g)
-index = rtt$p.value < 0.01 
+index = rtt$p.value < 0.01
 print (mean( !spike[index] ))
 ```
 
@@ -1551,7 +1553,7 @@ Use these new estimates (computed in Question 4.6.3) of standard deviation in th
 
 
 ```r
-index = pvals < 0.01 
+index = pvals < 0.01
 print (mean( !spike[index] ))
 ```
 
@@ -1683,7 +1685,7 @@ sd(e[,2]-e[,1])
 
 ### Plots Exercises #4
 
-How many fold changes above 2 do we see? Note that these measures of log (base 2) of expression so a fold change of 2 translates into a difference, in absolute value, of 1. 
+How many fold changes above 2 do we see? Note that these measures of log (base 2) of expression so a fold change of 2 translates into a difference, in absolute value, of 1.
 
 
 ```r
@@ -1694,4 +1696,3 @@ length(foldChange[foldChange < -1]) + length(foldChange[foldChange > 1])
 ```
 ## [1] 3057
 ```
-
