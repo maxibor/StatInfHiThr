@@ -2,9 +2,6 @@
 ## Exercices and corrections for the [PH525.3x Statistical Inference and Modeling for High-throughput Experiments](https://www.edx.org/course/statistical-inference-modeling-high-harvardx-ph525-3x) edX MOOC.
 
 ----
-
-
-      * [Exercices and corrections for the <a href="https://www.edx.org/course/statistical-inference-modeling-high-harvardx-ph525-3x">PH525.3x Statistical Inference and Modeling for High-throughput Experiments</a> edX MOOC.](#exercices-and-corrections-for-the-ph5253x-statistical-inference-and-modeling-for-high-throughput-experiments-edx-mooc)
    * [**WEEK 1**](#week-1)
       * [R Refresher Exercises](#r-refresher-exercises)
          * [R Refresher Exercises #1](#r-refresher-exercises-1)
