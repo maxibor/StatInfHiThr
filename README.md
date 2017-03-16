@@ -18,7 +18,7 @@
          * [Inference in Practice Exercises #4](#inference-in-practice-exercises-4)
          * [Inference in Practice Exercises #5](#inference-in-practice-exercises-5)
    * [**WEEK 2**](#week-2)
-         * [Bonferroni Correction Exercises #2 (Monte Carlo Simulation)](#bonferroni-correction-exercises-2-monte-carlo-simulation)
+      * [Bonferroni Correction Exercises #2 (Monte Carlo Simulation)](#bonferroni-correction-exercises-2-monte-carlo-simulation)
       * [FDR Exercises](#fdr-exercises)
          * [FDR Exercises #1](#fdr-exercises-1)
          * [FDR Exercises #2](#fdr-exercises-2)
